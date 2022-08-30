@@ -1,0 +1,4 @@
+name: Economy
+version: '${project.version}'
+main: net.teamuni.economy.Economy
+api-version: 1.18
