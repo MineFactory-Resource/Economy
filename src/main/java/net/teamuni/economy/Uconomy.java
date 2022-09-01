@@ -6,7 +6,7 @@ public final class Uconomy extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+        MoneyManager.createMoneyDataYml();
     }
 
     @Override
