@@ -20,7 +20,6 @@ public class JoinEvent implements Listener {
 
         if (!playerSet.contains(playerUuid)) {
             playerSet.add(playerUuid);
-            MoneyManager.get().set("player.money", playerSet);
             MoneyManager.get().set("player.money." + playerUuid, 0);
             Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
         }
