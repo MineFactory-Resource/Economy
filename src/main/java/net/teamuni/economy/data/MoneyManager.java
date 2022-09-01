@@ -1,5 +1,6 @@
-package net.teamuni.economy;
+package net.teamuni.economy.data;
 
+import net.teamuni.economy.Uconomy;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
