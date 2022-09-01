@@ -11,6 +11,6 @@ public final class Uconomy extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        MoneyManager.save();
     }
 }
