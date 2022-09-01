@@ -2,3 +2,10 @@ name: Uconomy
 version: '${project.version}'
 main: net.teamuni.economy.Uconomy
 api-version: 1.18
+commands:
+  돈:
+    permission: ucon.money
+
+permissions:
+  ucon.money:
+    default: true
