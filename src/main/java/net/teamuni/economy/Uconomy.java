@@ -93,6 +93,7 @@ public final class Uconomy extends JavaPlugin {
                     MessageManager.reload();
                     player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "Uconomy has been reloaded!");
                 }
+                return false;
             }
         }
         return false;
