@@ -32,6 +32,14 @@ public class CommandTabCompleter implements TabCompleter {
             }
             return tabComleteMessage;
         }
+        if (command.getName().equalsIgnoreCase("uconomy")) {
+            List<String> tabComleteMessage = new ArrayList<>();
+
+            if (args.length == 1) {
+                tabComleteMessage.add("reload");
+            }
+            return tabComleteMessage;
+        }
         return null;
     }
 }

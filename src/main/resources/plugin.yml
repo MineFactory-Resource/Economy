@@ -5,6 +5,10 @@ api-version: 1.18
 commands:
   돈:
     permission: ucon.money
+  uconomy:
+    permission: ucon.reload
 permissions:
   ucon.money:
     default: true
+  ucon.reload:
+    default: op

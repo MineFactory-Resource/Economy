@@ -21,6 +21,7 @@ public final class Uconomy extends JavaPlugin {
         MessageManager.createMessagesYml();
         Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
         getCommand("돈").setTabCompleter(new CommandTabCompleter());
+        getCommand("uconomy").setTabCompleter(new CommandTabCompleter());
     }
 
     @Override
@@ -56,9 +57,9 @@ public final class Uconomy extends JavaPlugin {
                                                 long updatedRecipientMoney = MoneyManager.get().getLong("player.money." + recipient.getUniqueId()) + Long.parseLong(args[2]);
                                                 MoneyManager.get().set("player.money." + player.getUniqueId(), updatedPlayerMoney);
                                                 MoneyManager.get().set("player.money." + recipient.getUniqueId(), updatedRecipientMoney);
-                                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님에게" +
+                                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님에게 " +
                                                         ChatColor.GOLD + args[2] + "만큼의 돈을 보냈습니다.");
-                                                messageForm(recipient, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님으로부터" +
+                                                messageForm(recipient, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님으로부터 " +
                                                         ChatColor.GOLD + args[2] + "만큼의 돈을 받았습니다.");
                                                 player.sendMessage(ChatColor.GREEN + "잔액: " + updatedPlayerMoney);
                                                 recipient.sendMessage(ChatColor.GREEN + "잔액: " + updatedRecipientMoney);
@@ -85,6 +86,13 @@ public final class Uconomy extends JavaPlugin {
                     }
                 }
                 return false;
+            }
+            if (command.getName().equalsIgnoreCase("uconomy") && player.hasPermission("ucon.reload")) {
+                if (args[0].equalsIgnoreCase("reload")) {
+                    MoneyManager.save();
+                    MessageManager.reload();
+                    player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "Uconomy has been reloaded!");
+                }
             }
         }
         return false;
