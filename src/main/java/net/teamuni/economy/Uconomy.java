@@ -81,7 +81,7 @@ public final class Uconomy extends JavaPlugin {
                             break;
                         case "지급":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
+                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         long increasedPlayerMoney = MoneyManager.get().getLong("player.money." + Bukkit.getPlayer(args[1]).getUniqueId()) + Long.parseLong(args[2]);
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), increasedPlayerMoney);
@@ -90,7 +90,7 @@ public final class Uconomy extends JavaPlugin {
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "숫자가 들어가야 하는 자리에 문자가 들어갈 수 없습니다.");
                                     }
                                 } else {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "해당 플레이어의 돈 정보가 존재하지 않습니다.");
+                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "입력하신 플레이어는 존재하지 않거나 오프라인 상태입니다.");
                                 }
                             } else {
                                 messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
@@ -98,7 +98,7 @@ public final class Uconomy extends JavaPlugin {
                             break;
                         case "차감":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
+                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         long decreasedPlayerMoney = MoneyManager.get().getLong("player.money." + Bukkit.getPlayer(args[1]).getUniqueId()) - Long.parseLong(args[2]);
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), decreasedPlayerMoney);
@@ -107,7 +107,7 @@ public final class Uconomy extends JavaPlugin {
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "숫자가 들어가야 하는 자리에 문자가 들어갈 수 없습니다.");
                                     }
                                 } else {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "해당 플레이어의 돈 정보가 존재하지 않습니다.");
+                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "입력하신 플레이어는 존재하지 않거나 오프라인 상태입니다.");
                                 }
                             } else {
                                 messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
@@ -115,7 +115,7 @@ public final class Uconomy extends JavaPlugin {
                             break;
                         case "설정":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
+                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), Long.parseLong(args[2]));
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님의 돈을 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원으로 설정하였습니다.");
@@ -123,7 +123,7 @@ public final class Uconomy extends JavaPlugin {
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "숫자가 들어가야 하는 자리에 문자가 들어갈 수 없습니다.");
                                     }
                                 } else {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "해당 플레이어의 돈 정보가 존재하지 않습니다.");
+                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "입력하신 플레이어는 존재하지 않거나 오프라인 상태입니다.");
                                 }
                             } else {
                                 messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
