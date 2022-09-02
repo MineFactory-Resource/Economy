@@ -118,7 +118,7 @@ public final class Uconomy extends JavaPlugin {
                                 if (MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), Long.parseLong(args[2]));
-                                        messageForm(player, ChatColor.AQUA + "[알림] " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님의 돈을 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원으로 설정하였습니다.");
+                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님의 돈을 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원으로 설정하였습니다.");
                                     } else {
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "숫자가 들어가야 하는 자리에 문자가 들어갈 수 없습니다.");
                                     }
