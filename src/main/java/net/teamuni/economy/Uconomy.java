@@ -60,13 +60,13 @@ public final class Uconomy extends JavaPlugin {
                                                     MoneyManager.get().set("player.money." + player.getUniqueId(), updatedPlayerMoney);
                                                     MoneyManager.get().set("player.money." + recipient.getUniqueId(), updatedRecipientMoney);
                                                     messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님에게 " +
-                                                            ChatColor.GOLD + args[2] + "만큼의 돈을 보냈습니다.");
+                                                            ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원을 보냈습니다.");
                                                     messageForm(recipient, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님으로부터 " +
-                                                            ChatColor.GOLD + args[2] + "만큼의 돈을 받았습니다.");
-                                                    player.sendMessage(ChatColor.GREEN + "잔액: " + updatedPlayerMoney);
-                                                    recipient.sendMessage(ChatColor.GREEN + "잔액: " + updatedRecipientMoney);
+                                                            ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원을 받았습니다.");
+                                                    player.sendMessage(ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "잔액: " + ChatColor.GOLD + df.format(updatedPlayerMoney) + ChatColor.WHITE + "원");
+                                                    recipient.sendMessage(ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "잔액: " + ChatColor.GOLD + df.format(updatedRecipientMoney) + ChatColor.WHITE + "원");
                                                 } else {
-                                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "최소 " + ChatColor.GOLD + getConfig().getLong("minimum_amount") +
+                                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "최소 " + ChatColor.GOLD + df.format(getConfig().getLong("minimum_amount")) +
                                                             ChatColor.WHITE + "원 이상부터 보낼 수 있습니다.");
                                                 }
                                             } else {
@@ -137,8 +137,14 @@ public final class Uconomy extends JavaPlugin {
                             break;
                     }
                 } else {
-                    for (String guideMessages : MessageManager.get().getStringList("money_command_guide")) {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', guideMessages));
+                    if (player.hasPermission("ucon.manage")) {
+                        for (String guideMessages : MessageManager.get().getStringList("money_command_guide_for_op")) {
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', guideMessages));
+                        }
+                    } else {
+                        for (String guideMessages : MessageManager.get().getStringList("money_command_guide")) {
+                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', guideMessages));
+                        }
                     }
                 }
                 return false;
