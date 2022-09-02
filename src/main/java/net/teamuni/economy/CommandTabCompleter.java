@@ -32,6 +32,13 @@ public class CommandTabCompleter implements TabCompleter {
                     tabComleteMessage.add("보내기");
                 }
             }
+            if (args[0].equalsIgnoreCase("확인") && player.hasPermission("ucon.manage")) {
+                if (args.length == 2) {
+                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                        tabComleteMessage.add(onlinePlayers.getName());
+                    }
+                }
+            }
             if (args[0].equalsIgnoreCase("보내기")) {
                 if (args.length == 2) {
                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
