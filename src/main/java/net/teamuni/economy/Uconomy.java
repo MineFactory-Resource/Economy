@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 public final class Uconomy extends JavaPlugin {
 
@@ -40,18 +41,27 @@ public final class Uconomy extends JavaPlugin {
                 if (args.length > 0) {
                     switch (args[0]) {
                         case "확인":
-                            if (args.length == 1) {
-                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "현재 " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님이 보유하고 있는 돈은 " + ChatColor.GOLD +
-                                        df.format(MoneyManager.get().getLong("player.money." + player.getUniqueId())) + ChatColor.WHITE + "원입니다.");
-                            } else if (args.length == 2 && player.hasPermission("ucon.manage")) {
-                                if (MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "현재 " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님의 보유하고 있는 돈은 " + ChatColor.GOLD +
-                                            df.format(MoneyManager.get().getLong("player.money." + Bukkit.getPlayer(args[1]).getUniqueId())) + ChatColor.WHITE + "원입니다.");
-                                } else {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "해당 플레이어의 돈 정보가 존재하지 않습니다.");
-                                }
-                            } else {
-                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "올바르지 않은 명령어입니다.");
+                            switch (args.length) {
+                                case 1:
+                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "현재 " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님이 보유하고 있는 돈은 " + ChatColor.GOLD +
+                                            df.format(MoneyManager.get().getLong("player.money." + player.getUniqueId())) + ChatColor.WHITE + "원입니다.");
+                                    break;
+                                case 2:
+                                    if (player.hasPermission("ucon.manage")) {
+                                        Player target = Bukkit.getPlayer(args[1]);
+                                        if (target != null && MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(target.getUniqueId().toString())) {
+                                            messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "현재 " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님의 보유하고 있는 돈은 " + ChatColor.GOLD +
+                                                    df.format(MoneyManager.get().getLong("player.money." + target.getUniqueId())) + ChatColor.WHITE + "원입니다.");
+                                        } else {
+                                            messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "해당 플레이어의 돈 정보가 존재하지 않습니다.");
+                                        }
+                                    } else {
+                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
+                                    }
+                                    break;
+                                default:
+                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "올바르지 않은 명령어입니다.");
+                                    break;
                             }
                             break;
                         case "보내기":
