@@ -17,6 +17,7 @@ public final class Uconomy extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         MoneyManager.createMoneyDataYml();
         MessageManager.createMessagesYml();
         Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
@@ -53,16 +54,21 @@ public final class Uconomy extends JavaPlugin {
                                     if (recipient != player) {
                                         if (args[2].matches("[0-9]+")) {
                                             if (MoneyManager.get().getLong("player.money." + player.getUniqueId()) >= Long.parseLong(args[2])) {
-                                                long updatedPlayerMoney = MoneyManager.get().getLong("player.money." + player.getUniqueId()) - Long.parseLong(args[2]);
-                                                long updatedRecipientMoney = MoneyManager.get().getLong("player.money." + recipient.getUniqueId()) + Long.parseLong(args[2]);
-                                                MoneyManager.get().set("player.money." + player.getUniqueId(), updatedPlayerMoney);
-                                                MoneyManager.get().set("player.money." + recipient.getUniqueId(), updatedRecipientMoney);
-                                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님에게 " +
-                                                        ChatColor.GOLD + args[2] + "만큼의 돈을 보냈습니다.");
-                                                messageForm(recipient, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님으로부터 " +
-                                                        ChatColor.GOLD + args[2] + "만큼의 돈을 받았습니다.");
-                                                player.sendMessage(ChatColor.GREEN + "잔액: " + updatedPlayerMoney);
-                                                recipient.sendMessage(ChatColor.GREEN + "잔액: " + updatedRecipientMoney);
+                                                if (Long.parseLong(args[2]) >= getConfig().getLong("minimum_amount")) {
+                                                    long updatedPlayerMoney = MoneyManager.get().getLong("player.money." + player.getUniqueId()) - Long.parseLong(args[2]);
+                                                    long updatedRecipientMoney = MoneyManager.get().getLong("player.money." + recipient.getUniqueId()) + Long.parseLong(args[2]);
+                                                    MoneyManager.get().set("player.money." + player.getUniqueId(), updatedPlayerMoney);
+                                                    MoneyManager.get().set("player.money." + recipient.getUniqueId(), updatedRecipientMoney);
+                                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + args[1] + ChatColor.WHITE + "님에게 " +
+                                                            ChatColor.GOLD + args[2] + "만큼의 돈을 보냈습니다.");
+                                                    messageForm(recipient, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님으로부터 " +
+                                                            ChatColor.GOLD + args[2] + "만큼의 돈을 받았습니다.");
+                                                    player.sendMessage(ChatColor.GREEN + "잔액: " + updatedPlayerMoney);
+                                                    recipient.sendMessage(ChatColor.GREEN + "잔액: " + updatedRecipientMoney);
+                                                } else {
+                                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "최소 " + ChatColor.GOLD + getConfig().getLong("minimum_amount") +
+                                                            ChatColor.WHITE + "원 이상부터 보낼 수 있습니다.");
+                                                }
                                             } else {
                                                 messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "돈이 부족합니다.");
                                             }
@@ -139,6 +145,7 @@ public final class Uconomy extends JavaPlugin {
             }
             if (command.getName().equalsIgnoreCase("uconomy") && player.hasPermission("ucon.reload")) {
                 if (args[0].equalsIgnoreCase("reload")) {
+                    reloadConfig();
                     MoneyManager.save();
                     MessageManager.reload();
                     player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "Uconomy has been reloaded!");
