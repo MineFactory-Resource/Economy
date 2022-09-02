@@ -12,3 +12,5 @@ permissions:
     default: true
   ucon.reload:
     default: op
+  ucon.manage:
+    default: op
