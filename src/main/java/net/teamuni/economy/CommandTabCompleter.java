@@ -39,7 +39,7 @@ public class CommandTabCompleter implements TabCompleter {
                     }
                 }
                 if (args.length == 3) {
-                    tabComleteMessage.add("숫자 값");
+                    tabComleteMessage.add("금액");
                 }
             }
             if (args[0].equalsIgnoreCase("지급") || args[0].equalsIgnoreCase("차감") || args[0].equalsIgnoreCase("설정")) {
@@ -50,7 +50,7 @@ public class CommandTabCompleter implements TabCompleter {
                         }
                     }
                     if (args.length == 3) {
-                        tabComleteMessage.add("숫자 값");
+                        tabComleteMessage.add("금액");
                     }
                 }
             }
