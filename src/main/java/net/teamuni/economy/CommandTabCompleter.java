@@ -15,20 +15,44 @@ public class CommandTabCompleter implements TabCompleter {
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        Player player = (Player) sender;
+
         if (command.getName().equalsIgnoreCase("돈")) {
             List<String> tabComleteMessage = new ArrayList<>();
 
             if (args.length == 1) {
-                tabComleteMessage.add("확인");
-                tabComleteMessage.add("보내기");
-            }
-            if (args[0].equalsIgnoreCase("보내기") && args.length == 2) {
-                for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                    tabComleteMessage.add(onlinePlayers.getName());
+                if (player.hasPermission("ucon.manage")) {
+                    tabComleteMessage.add("확인");
+                    tabComleteMessage.add("보내기");
+                    tabComleteMessage.add("지급");
+                    tabComleteMessage.add("차감");
+                    tabComleteMessage.add("설정");
+                } else {
+                    tabComleteMessage.add("확인");
+                    tabComleteMessage.add("보내기");
                 }
             }
-            if (args.length == 3) {
-                tabComleteMessage.add("숫자 값");
+            if (args[0].equalsIgnoreCase("보내기")) {
+                if (args.length == 2) {
+                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                        tabComleteMessage.add(onlinePlayers.getName());
+                    }
+                }
+                if (args.length == 3) {
+                    tabComleteMessage.add("숫자 값");
+                }
+            }
+            if (args[0].equalsIgnoreCase("지급") || args[0].equalsIgnoreCase("차감") || args[0].equalsIgnoreCase("설정")) {
+                if (player.hasPermission("ucon.manage")) {
+                    if (args.length == 2) {
+                        for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
+                            tabComleteMessage.add(onlinePlayers.getName());
+                        }
+                    }
+                    if (args.length == 3) {
+                        tabComleteMessage.add("숫자 값");
+                    }
+                }
             }
             return tabComleteMessage;
         }
@@ -43,4 +67,3 @@ public class CommandTabCompleter implements TabCompleter {
         return null;
     }
 }
-
