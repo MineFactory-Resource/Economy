@@ -160,7 +160,11 @@ public final class Uconomy extends JavaPlugin {
                                 if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         long decreasedPlayerMoney = MoneyManager.get().getLong("player.money." + Bukkit.getPlayer(args[1]).getUniqueId()) - Long.parseLong(args[2]);
-                                        MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), decreasedPlayerMoney);
+                                        if (decreasedPlayerMoney < 0) {
+                                            MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), 0);
+                                        } else {
+                                            MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), decreasedPlayerMoney);
+                                        }
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(args[1]).getName() + ChatColor.WHITE + "님의 돈을 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원 차감하였습니다.");
                                     } else {
                                         for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
