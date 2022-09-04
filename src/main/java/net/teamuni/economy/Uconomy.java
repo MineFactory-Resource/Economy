@@ -12,9 +12,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
-import java.util.Objects;
+import java.util.List;
 
 public final class Uconomy extends JavaPlugin {
+
+    List<String> reloadMessageList;
+    List<String> commandGuideMessageList;
+    List<String> opCommandGuideMessageList;
+    List<String> notAvailableCommandMessageList;
+    List<String> incorrectPlayerNameMessageList;
+    List<String> invaildSyntaxMessageList;
+    List<String> moneyShortageMessageList;
+    List<String> attemptToDepositToOneselfMessageList;
+    List<String> checkMoneyOneselfMessageList;
+
+    DecimalFormat df = new DecimalFormat("###,###");
 
     @Override
     public void onEnable() {
@@ -24,6 +36,7 @@ public final class Uconomy extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
         getCommand("돈").setTabCompleter(new CommandTabCompleter());
         getCommand("uconomy").setTabCompleter(new CommandTabCompleter());
+        getMessages();
     }
 
     @Override
@@ -35,7 +48,6 @@ public final class Uconomy extends JavaPlugin {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            DecimalFormat df = new DecimalFormat("###,###");
 
             if (command.getName().equalsIgnoreCase("돈")) {
                 if (args.length > 0) {
@@ -53,14 +65,20 @@ public final class Uconomy extends JavaPlugin {
                                             messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "현재 " + ChatColor.LIGHT_PURPLE + target.getName() + ChatColor.WHITE + "님이 보유하고 있는 돈은 " + ChatColor.GOLD +
                                                     df.format(MoneyManager.get().getLong("player.money." + target.getUniqueId())) + ChatColor.WHITE + "원입니다.");
                                         } else {
-                                            messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "입력하신 플레이어는 존재하지 않거나 오프라인 상태입니다.");
+                                            for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
+                                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
+                                            }
                                         }
                                     } else {
-                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
+                                        for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                                        }
                                     }
                                     break;
                                 default:
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "올바르지 않은 명령어입니다.");
+                                    for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
+                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                                    }
                                     break;
                             }
                             break;
@@ -89,19 +107,29 @@ public final class Uconomy extends JavaPlugin {
                                                             ChatColor.WHITE + "원 이상부터 보낼 수 있습니다.");
                                                 }
                                             } else {
-                                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "돈이 부족합니다.");
+                                                for (String moneyShortageMessages : moneyShortageMessageList) {
+                                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', moneyShortageMessages));
+                                                }
                                             }
                                         } else {
-                                            messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "숫자가 들어가야 하는 자리에 문자가 들어갈 수 없습니다.");
+                                            for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
+                                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
+                                            }
                                         }
                                     } else {
-                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "자신에게 돈을 보낼 수 없습니다.");
+                                        for (String attemptToDepositToOneselfMessages : attemptToDepositToOneselfMessageList) {
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', attemptToDepositToOneselfMessages));
+                                        }
                                     }
                                 } else {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "입력하신 플레이어는 존재하지 않거나 오프라인 상태입니다.");
+                                    for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
+                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
+                                    }
                                 }
                             } else {
-                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
+                                for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                                }
                             }
                             break;
                         case "지급":
@@ -112,13 +140,19 @@ public final class Uconomy extends JavaPlugin {
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), increasedPlayerMoney);
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(args[1]).getName() + ChatColor.WHITE + "님에게 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원을 지급하였습니다.");
                                     } else {
-                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "숫자가 들어가야 하는 자리에 문자가 들어갈 수 없습니다.");
+                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
+                                        }
                                     }
                                 } else {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "입력하신 플레이어는 존재하지 않거나 오프라인 상태입니다.");
+                                    for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
+                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
+                                    }
                                 }
                             } else {
-                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
+                                for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                                }
                             }
                             break;
                         case "차감":
@@ -129,13 +163,19 @@ public final class Uconomy extends JavaPlugin {
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), decreasedPlayerMoney);
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(args[1]).getName() + ChatColor.WHITE + "님의 돈을 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원 차감하였습니다.");
                                     } else {
-                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "숫자가 들어가야 하는 자리에 문자가 들어갈 수 없습니다.");
+                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
+                                        }
                                     }
                                 } else {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "입력하신 플레이어는 존재하지 않거나 오프라인 상태입니다.");
+                                    for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
+                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
+                                    }
                                 }
                             } else {
-                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
+                                for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                                }
                             }
                             break;
                         case "설정":
@@ -145,26 +185,34 @@ public final class Uconomy extends JavaPlugin {
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), Long.parseLong(args[2]));
                                         messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(args[1]).getName() + ChatColor.WHITE + "님의 돈을 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원으로 설정하였습니다.");
                                     } else {
-                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "숫자가 들어가야 하는 자리에 문자가 들어갈 수 없습니다.");
+                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
+                                        }
                                     }
                                 } else {
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "입력하신 플레이어는 존재하지 않거나 오프라인 상태입니다.");
+                                    for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
+                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
+                                    }
                                 }
                             } else {
-                                messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
+                                for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                                }
                             }
                             break;
                         default:
-                            messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.GREEN + ChatColor.WHITE + "명령어를 실행할 수 없습니다.");
+                            for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
+                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                            }
                             break;
                     }
                 } else {
                     if (player.hasPermission("ucon.manage")) {
-                        for (String guideMessages : MessageManager.get().getStringList("money_command_guide_for_op")) {
+                        for (String guideMessages : opCommandGuideMessageList) {
                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', guideMessages));
                         }
                     } else {
-                        for (String guideMessages : MessageManager.get().getStringList("money_command_guide")) {
+                        for (String guideMessages : commandGuideMessageList) {
                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', guideMessages));
                         }
                     }
@@ -174,9 +222,12 @@ public final class Uconomy extends JavaPlugin {
             if (command.getName().equalsIgnoreCase("uconomy") && player.hasPermission("ucon.reload")) {
                 if (args[0].equalsIgnoreCase("reload")) {
                     reloadConfig();
+                    getMessages();
                     MoneyManager.save();
                     MessageManager.reload();
-                    player.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "Uconomy has been reloaded!");
+                    for (String reloadMessages : reloadMessageList) {
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', reloadMessages));
+                    }
                 }
                 return false;
             }
@@ -188,5 +239,21 @@ public final class Uconomy extends JavaPlugin {
         player.sendMessage("");
         player.sendMessage(string);
         player.sendMessage("");
+    }
+
+    public void getMessages() {
+        try {
+            reloadMessageList = MessageManager.get().getStringList("reload_message");
+            commandGuideMessageList = MessageManager.get().getStringList("money_command_guide");
+            opCommandGuideMessageList = MessageManager.get().getStringList("money_command_guide_for_op");
+            notAvailableCommandMessageList = MessageManager.get().getStringList("not_available_command");
+            incorrectPlayerNameMessageList = MessageManager.get().getStringList("incorrect_player_name");
+            invaildSyntaxMessageList = MessageManager.get().getStringList("invaild_syntax");
+            moneyShortageMessageList = MessageManager.get().getStringList("money_shortage");
+            attemptToDepositToOneselfMessageList = MessageManager.get().getStringList("attempt_to_deposit_to_oneself");
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            getLogger().info("messages.yml에서 메시지를 불러오는 도중 문제가 발생했습니다.");
+        }
     }
 }
