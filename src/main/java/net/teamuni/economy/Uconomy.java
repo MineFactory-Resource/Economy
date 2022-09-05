@@ -121,7 +121,7 @@ public final class Uconomy extends JavaPlugin {
                                                                 .replace("%name_of_sender%", player.getName())
                                                                 .replace("%received_money%", df.format(Long.parseLong(args[2]))
                                                                 .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney)));
-                                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                                        recipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                                     }
                                                 } else {
                                                     for (String minimumAmountCautionMessages : minimumAmountCautionMessageList) {
