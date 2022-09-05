@@ -24,6 +24,14 @@ public final class Uconomy extends JavaPlugin {
     List<String> invaildSyntaxMessageList;
     List<String> moneyShortageMessageList;
     List<String> attemptToDepositToOneselfMessageList;
+    List<String> checkMyMoneyMessageList;
+    List<String> checkTheOtherPlayerMoneyMessageList;
+    List<String> transactionConfirmToSenderMessageList;
+    List<String> transactionConfirmToRecipientMessageList;
+    List<String> minimumAmountCautionMessageList;
+    List<String> increasePlayerMoneyMessageList;
+    List<String> decreasePlayerMoneyMessageList;
+    List<String> setPlayerMoneyMessageList;
 
     DecimalFormat df = new DecimalFormat("###,###");
 
@@ -54,15 +62,23 @@ public final class Uconomy extends JavaPlugin {
                         case "확인":
                             switch (args.length) {
                                 case 1:
-                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "현재 " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님이 보유하고 있는 돈은 " + ChatColor.GOLD +
-                                            df.format(MoneyManager.get().getLong("player.money." + player.getUniqueId())) + ChatColor.WHITE + "원입니다.");
+                                    for (String checkMyMoneyMessages : checkMyMoneyMessageList) {
+                                        String translatedMessages = checkMyMoneyMessages
+                                                .replace("%name_of_player%", player.getName())
+                                                .replace("%player_money%", df.format(MoneyManager.get().getLong("player.money." + player.getUniqueId())));
+                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                    }
                                     break;
                                 case 2:
                                     if (player.hasPermission("ucon.manage")) {
                                         Player target = Bukkit.getPlayer(args[1]);
                                         if (target != null && MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(target.getUniqueId().toString())) {
-                                            messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "현재 " + ChatColor.LIGHT_PURPLE + target.getName() + ChatColor.WHITE + "님이 보유하고 있는 돈은 " + ChatColor.GOLD +
-                                                    df.format(MoneyManager.get().getLong("player.money." + target.getUniqueId())) + ChatColor.WHITE + "원입니다.");
+                                            for (String checkTheOtherPlayerMoneyMessages : checkTheOtherPlayerMoneyMessageList) {
+                                                String translatedMessages = checkTheOtherPlayerMoneyMessages
+                                                        .replace("%name_of_player%", target.getName())
+                                                        .replace("%player_money%", df.format(MoneyManager.get().getLong("player.money." + target.getUniqueId())));
+                                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                            }
                                         } else {
                                             for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
                                                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
@@ -93,17 +109,26 @@ public final class Uconomy extends JavaPlugin {
                                                     long updatedRecipientMoney = MoneyManager.get().getLong("player.money." + recipient.getUniqueId()) + Long.parseLong(args[2]);
                                                     MoneyManager.get().set("player.money." + player.getUniqueId(), updatedPlayerMoney);
                                                     MoneyManager.get().set("player.money." + recipient.getUniqueId(), updatedRecipientMoney);
-                                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + recipient.getName() + ChatColor.WHITE + "님에게 " +
-                                                            ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원을 보냈습니다.");
-                                                    messageForm(recipient, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + "님으로부터 " +
-                                                            ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원을 받았습니다.");
-                                                    player.sendMessage(ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "잔액: " + ChatColor.GOLD + df.format(updatedPlayerMoney) + ChatColor.WHITE + "원");
-                                                    player.sendMessage("");
-                                                    recipient.sendMessage(ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "잔액: " + ChatColor.GOLD + df.format(updatedRecipientMoney) + ChatColor.WHITE + "원");
-                                                    recipient.sendMessage("");
+                                                    for (String transactionConfirmToSenderMessages : transactionConfirmToSenderMessageList) {
+                                                        String translatedMessages = transactionConfirmToSenderMessages
+                                                                .replace("%name_of_recipient%", recipient.getName())
+                                                                .replace("%sent_money%", df.format(Long.parseLong(args[2]))
+                                                                .replace("%sender_money_after_transaction%", df.format(updatedPlayerMoney)));
+                                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                                    }
+                                                    for (String transactionConfirmToRecipientMessages : transactionConfirmToRecipientMessageList) {
+                                                        String translatedMessages = transactionConfirmToRecipientMessages
+                                                                .replace("%name_of_sender%", player.getName())
+                                                                .replace("%received_money%", df.format(Long.parseLong(args[2]))
+                                                                .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney)));
+                                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                                    }
                                                 } else {
-                                                    messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.WHITE + "최소 " + ChatColor.GOLD + df.format(getConfig().getLong("minimum_amount")) +
-                                                            ChatColor.WHITE + "원 이상부터 보낼 수 있습니다.");
+                                                    for (String minimumAmountCautionMessages : minimumAmountCautionMessageList) {
+                                                        String translatedMessages = minimumAmountCautionMessages
+                                                                .replace("%value_of_minimum%", df.format(getConfig().getLong("minimum_amount")));
+                                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                                    }
                                                 }
                                             } else {
                                                 for (String moneyShortageMessages : moneyShortageMessageList) {
@@ -137,7 +162,12 @@ public final class Uconomy extends JavaPlugin {
                                     if (args[2].matches("[0-9]+")) {
                                         long increasedPlayerMoney = MoneyManager.get().getLong("player.money." + Bukkit.getPlayer(args[1]).getUniqueId()) + Long.parseLong(args[2]);
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), increasedPlayerMoney);
-                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(args[1]).getName() + ChatColor.WHITE + "님에게 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원을 지급하였습니다.");
+                                        for (String increasePlayerMoneyMessages : increasePlayerMoneyMessageList) {
+                                            String translatedMessages = increasePlayerMoneyMessages
+                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
+                                                    .replace("%increased_money%", df.format(Long.parseLong(args[2])));
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                        }
                                     } else {
                                         for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
@@ -164,7 +194,12 @@ public final class Uconomy extends JavaPlugin {
                                         } else {
                                             MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), decreasedPlayerMoney);
                                         }
-                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(args[1]).getName() + ChatColor.WHITE + "님의 돈을 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원 차감하였습니다.");
+                                        for (String decreasePlayerMoneyMessages : decreasePlayerMoneyMessageList) {
+                                            String translatedMessages = decreasePlayerMoneyMessages
+                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
+                                                    .replace("%decreased_money%", df.format(Long.parseLong(args[2])));
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                        }
                                     } else {
                                         for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
@@ -186,7 +221,12 @@ public final class Uconomy extends JavaPlugin {
                                 if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player.money").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         MoneyManager.get().set("player.money." + Bukkit.getPlayer(args[1]).getUniqueId(), Long.parseLong(args[2]));
-                                        messageForm(player, ChatColor.YELLOW + "[알림] " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(args[1]).getName() + ChatColor.WHITE + "님의 돈을 " + ChatColor.GOLD + df.format(Long.parseLong(args[2])) + ChatColor.WHITE + "원으로 설정하였습니다.");
+                                        for (String setPlayerMoneyMessages : setPlayerMoneyMessageList) {
+                                            String translatedMessages = setPlayerMoneyMessages
+                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
+                                                    .replace("%set_money%", df.format(Long.parseLong(args[2])));
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                        }
                                     } else {
                                         for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
@@ -238,12 +278,6 @@ public final class Uconomy extends JavaPlugin {
         return false;
     }
 
-    public void messageForm(Player player, String string) {
-        player.sendMessage("");
-        player.sendMessage(string);
-        player.sendMessage("");
-    }
-
     public void getMessages() {
         try {
             reloadMessageList = MessageManager.get().getStringList("reload_message");
@@ -254,6 +288,14 @@ public final class Uconomy extends JavaPlugin {
             invaildSyntaxMessageList = MessageManager.get().getStringList("invaild_syntax");
             moneyShortageMessageList = MessageManager.get().getStringList("money_shortage");
             attemptToDepositToOneselfMessageList = MessageManager.get().getStringList("attempt_to_deposit_to_oneself");
+            checkMyMoneyMessageList = MessageManager.get().getStringList("check_my_money");
+            checkTheOtherPlayerMoneyMessageList = MessageManager.get().getStringList("check_the_other_player_money");
+            transactionConfirmToSenderMessageList = MessageManager.get().getStringList("transaction_confirm_to_sender");
+            transactionConfirmToRecipientMessageList = MessageManager.get().getStringList("transaction_confirm_to_recipient");
+            minimumAmountCautionMessageList = MessageManager.get().getStringList("minimum_amount_caution");
+            increasePlayerMoneyMessageList = MessageManager.get().getStringList("increase_player_money");
+            decreasePlayerMoneyMessageList = MessageManager.get().getStringList("decrease_player_money");
+            setPlayerMoneyMessageList = MessageManager.get().getStringList("set_player_money");
         } catch (NullPointerException e) {
             e.printStackTrace();
             getLogger().info("messages.yml에서 메시지를 불러오는 도중 문제가 발생했습니다.");
