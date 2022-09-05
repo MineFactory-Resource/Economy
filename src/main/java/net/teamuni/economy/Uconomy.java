@@ -24,7 +24,6 @@ public final class Uconomy extends JavaPlugin {
     List<String> invaildSyntaxMessageList;
     List<String> moneyShortageMessageList;
     List<String> attemptToDepositToOneselfMessageList;
-    List<String> checkMoneyOneselfMessageList;
 
     DecimalFormat df = new DecimalFormat("###,###");
 
