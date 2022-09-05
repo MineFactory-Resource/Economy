@@ -112,15 +112,15 @@ public final class Uconomy extends JavaPlugin {
                                                     for (String transactionConfirmToSenderMessages : transactionConfirmToSenderMessageList) {
                                                         String translatedMessages = transactionConfirmToSenderMessages
                                                                 .replace("%name_of_recipient%", recipient.getName())
-                                                                .replace("%sent_money%", df.format(Long.parseLong(args[2]))
-                                                                .replace("%sender_money_after_transaction%", df.format(updatedPlayerMoney)));
+                                                                .replace("%sent_money%", df.format(Long.parseLong(args[2])))
+                                                                .replace("%sender_money_after_transaction%", df.format(updatedPlayerMoney));
                                                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                                     }
                                                     for (String transactionConfirmToRecipientMessages : transactionConfirmToRecipientMessageList) {
                                                         String translatedMessages = transactionConfirmToRecipientMessages
                                                                 .replace("%name_of_sender%", player.getName())
-                                                                .replace("%received_money%", df.format(Long.parseLong(args[2]))
-                                                                .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney)));
+                                                                .replace("%received_money%", df.format(Long.parseLong(args[2])))
+                                                                .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney));
                                                         recipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                                     }
                                                 } else {
