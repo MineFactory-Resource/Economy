@@ -31,39 +31,40 @@ public class CommandTabCompleter implements TabCompleter {
                     tabComleteMessage.add("확인");
                     tabComleteMessage.add("보내기");
                 }
-            }
-            if (args[0].equalsIgnoreCase("확인") && player.hasPermission("ucon.manage")) {
+                return tabComleteMessage;
+
+            } else if (args[0].equalsIgnoreCase("확인") && player.hasPermission("ucon.manage")) {
                 if (args.length == 2) {
                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
                         tabComleteMessage.add(onlinePlayers.getName());
                     }
                 }
-            }
-            if (args[0].equalsIgnoreCase("보내기")) {
+                return tabComleteMessage;
+
+            } else if (args[0].equalsIgnoreCase("보내기")) {
                 if (args.length == 2) {
                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
                         tabComleteMessage.add(onlinePlayers.getName());
                     }
-                }
-                if (args.length == 3) {
+                } else if (args.length == 3) {
                     tabComleteMessage.add("금액");
                 }
-            }
-            if (args[0].equalsIgnoreCase("지급") || args[0].equalsIgnoreCase("차감") || args[0].equalsIgnoreCase("설정")) {
+                return tabComleteMessage;
+
+            } else if (args[0].equalsIgnoreCase("지급") || args[0].equalsIgnoreCase("차감") || args[0].equalsIgnoreCase("설정")) {
                 if (player.hasPermission("ucon.manage")) {
                     if (args.length == 2) {
                         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
                             tabComleteMessage.add(onlinePlayers.getName());
                         }
-                    }
-                    if (args.length == 3) {
+                    } else if (args.length == 3) {
                         tabComleteMessage.add("금액");
                     }
                 }
+                return tabComleteMessage;
             }
-            return tabComleteMessage;
-        }
-        if (command.getName().equalsIgnoreCase("uconomy")) {
+
+        } else if (command.getName().equalsIgnoreCase("uconomy")) {
             List<String> tabComleteMessage = new ArrayList<>();
 
             if (args.length == 1) {
