@@ -8,8 +8,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.Set;
-
 public class JoinEvent implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
