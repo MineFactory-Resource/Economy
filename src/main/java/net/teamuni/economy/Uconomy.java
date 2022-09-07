@@ -5,6 +5,7 @@ import net.teamuni.economy.data.MoneyManager;
 import net.teamuni.economy.event.JoinEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Objects;
 
 public final class Uconomy extends JavaPlugin {
 
@@ -71,11 +73,11 @@ public final class Uconomy extends JavaPlugin {
                                     break;
                                 case 2:
                                     if (player.hasPermission("ucon.manage")) {
-                                        Player target = Bukkit.getPlayer(args[1]);
-                                        if (target != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(target.getUniqueId().toString())) {
+                                        OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+                                        if (MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(target.getUniqueId().toString())) {
                                             for (String checkTheOtherPlayerMoneyMessages : checkTheOtherPlayerMoneyMessageList) {
                                                 String translatedMessages = checkTheOtherPlayerMoneyMessages
-                                                        .replace("%name_of_player%", target.getName())
+                                                        .replace("%name_of_player%", Objects.requireNonNull(target.getName()))
                                                         .replace("%player_money%", df.format(MoneyManager.get().getLong("player." + target.getUniqueId())));
                                                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                             }
@@ -99,8 +101,8 @@ public final class Uconomy extends JavaPlugin {
                             break;
                         case "보내기":
                             if (args.length == 3) {
-                                Player recipient = Bukkit.getPlayer(args[1]);
-                                if (recipient != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(recipient.getUniqueId().toString())) {
+                                OfflinePlayer recipient = Bukkit.getOfflinePlayer(args[1]);
+                                if (MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(recipient.getUniqueId().toString())) {
                                     if (recipient != player) {
                                         if (args[2].matches("[0-9]+")) {
                                             if (MoneyManager.get().getLong("player." + player.getUniqueId()) >= Long.parseLong(args[2])) {
@@ -111,17 +113,21 @@ public final class Uconomy extends JavaPlugin {
                                                     MoneyManager.get().set("player." + recipient.getUniqueId(), updatedRecipientMoney);
                                                     for (String transactionConfirmToSenderMessages : transactionConfirmToSenderMessageList) {
                                                         String translatedMessages = transactionConfirmToSenderMessages
-                                                                .replace("%name_of_recipient%", recipient.getName())
+                                                                .replace("%name_of_recipient%", Objects.requireNonNull(recipient.getName()))
                                                                 .replace("%sent_money%", df.format(Long.parseLong(args[2])))
                                                                 .replace("%sender_money_after_transaction%", df.format(updatedPlayerMoney));
                                                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                                     }
-                                                    for (String transactionConfirmToRecipientMessages : transactionConfirmToRecipientMessageList) {
-                                                        String translatedMessages = transactionConfirmToRecipientMessages
-                                                                .replace("%name_of_sender%", player.getName())
-                                                                .replace("%received_money%", df.format(Long.parseLong(args[2])))
-                                                                .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney));
-                                                        recipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                                    if (recipient.isOnline()) {
+                                                        for (String transactionConfirmToRecipientMessages : transactionConfirmToRecipientMessageList) {
+                                                            String translatedMessages = transactionConfirmToRecipientMessages
+                                                                    .replace("%name_of_sender%", player.getName())
+                                                                    .replace("%received_money%", df.format(Long.parseLong(args[2])))
+                                                                    .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney));
+                                                            Player onlineRecipient = Bukkit.getPlayer(args[1]);
+                                                            assert onlineRecipient != null;
+                                                            onlineRecipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                                        }
                                                     }
                                                 } else {
                                                     for (String minimumAmountCautionMessages : minimumAmountCautionMessageList) {
@@ -158,13 +164,13 @@ public final class Uconomy extends JavaPlugin {
                             break;
                         case "지급":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
+                                if (MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getOfflinePlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
-                                        long increasedPlayerMoney = MoneyManager.get().getLong("player." + Bukkit.getPlayer(args[1]).getUniqueId()) + Long.parseLong(args[2]);
-                                        MoneyManager.get().set("player." + Bukkit.getPlayer(args[1]).getUniqueId(), increasedPlayerMoney);
+                                        long increasedPlayerMoney = MoneyManager.get().getLong("player." + Bukkit.getOfflinePlayer(args[1]).getUniqueId()) + Long.parseLong(args[2]);
+                                        MoneyManager.get().set("player." + Bukkit.getOfflinePlayer(args[1]).getUniqueId(), increasedPlayerMoney);
                                         for (String increasePlayerMoneyMessages : increasePlayerMoneyMessageList) {
                                             String translatedMessages = increasePlayerMoneyMessages
-                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
+                                                    .replace("%name_of_player%", Objects.requireNonNull(Bukkit.getOfflinePlayer(args[1]).getName()))
                                                     .replace("%increased_money%", df.format(Long.parseLong(args[2])));
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                         }
@@ -186,17 +192,17 @@ public final class Uconomy extends JavaPlugin {
                             break;
                         case "차감":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
+                                if (MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getOfflinePlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
-                                        long decreasedPlayerMoney = MoneyManager.get().getLong("player." + Bukkit.getPlayer(args[1]).getUniqueId()) - Long.parseLong(args[2]);
+                                        long decreasedPlayerMoney = MoneyManager.get().getLong("player." + Bukkit.getOfflinePlayer(args[1]).getUniqueId()) - Long.parseLong(args[2]);
                                         if (decreasedPlayerMoney < 0) {
-                                            MoneyManager.get().set("player." + Bukkit.getPlayer(args[1]).getUniqueId(), 0);
+                                            MoneyManager.get().set("player." + Bukkit.getOfflinePlayer(args[1]).getUniqueId(), 0);
                                         } else {
-                                            MoneyManager.get().set("player." + Bukkit.getPlayer(args[1]).getUniqueId(), decreasedPlayerMoney);
+                                            MoneyManager.get().set("player." + Bukkit.getOfflinePlayer(args[1]).getUniqueId(), decreasedPlayerMoney);
                                         }
                                         for (String decreasePlayerMoneyMessages : decreasePlayerMoneyMessageList) {
                                             String translatedMessages = decreasePlayerMoneyMessages
-                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
+                                                    .replace("%name_of_player%", Objects.requireNonNull(Bukkit.getOfflinePlayer(args[1]).getName()))
                                                     .replace("%decreased_money%", df.format(Long.parseLong(args[2])));
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                         }
@@ -218,12 +224,12 @@ public final class Uconomy extends JavaPlugin {
                             break;
                         case "설정":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
+                                if (MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getOfflinePlayer(args[1]).getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
-                                        MoneyManager.get().set("player." + Bukkit.getPlayer(args[1]).getUniqueId(), Long.parseLong(args[2]));
+                                        MoneyManager.get().set("player." + Bukkit.getOfflinePlayer(args[1]).getUniqueId(), Long.parseLong(args[2]));
                                         for (String setPlayerMoneyMessages : setPlayerMoneyMessageList) {
                                             String translatedMessages = setPlayerMoneyMessages
-                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
+                                                    .replace("%name_of_player%", Objects.requireNonNull(Bukkit.getOfflinePlayer(args[1]).getName()))
                                                     .replace("%set_money%", df.format(Long.parseLong(args[2])));
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                         }
