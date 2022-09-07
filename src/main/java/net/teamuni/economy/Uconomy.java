@@ -1,13 +1,19 @@
 package net.teamuni.economy;
 
+import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import net.teamuni.economy.config.MessageManager;
 import net.teamuni.economy.data.MoneyManager;
 import net.teamuni.economy.event.JoinEvent;
+import net.teamuni.economy.vault.EconomyManager;
+import net.teamuni.economy.vault.HookIntoVault;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +21,10 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 public final class Uconomy extends JavaPlugin {
+
+    public static Uconomy getInstance;
+    public EconomyManager economyManager;
+    private HookIntoVault hookIntoVault;
 
     List<String> reloadMessageList;
     List<String> commandGuideMessageList;
@@ -35,6 +45,10 @@ public final class Uconomy extends JavaPlugin {
 
     DecimalFormat df = new DecimalFormat("###,###");
 
+    private static Economy econ = null;
+    private static Permission perms = null;
+    private static Chat chat = null;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -44,11 +58,33 @@ public final class Uconomy extends JavaPlugin {
         getCommand("돈").setTabCompleter(new CommandTabCompleter());
         getCommand("uconomy").setTabCompleter(new CommandTabCompleter());
         getMessages();
+        getInstance = this;
+        economyManager = new EconomyManager();
+        hookIntoVault = new HookIntoVault();
+        hookIntoVault.hook();
+
+        if (!setupEconomy()) {
+            getLogger().info("Disabled due to no Vault dependency found!");
+            getServer().getPluginManager().disablePlugin(this);
+        }
     }
 
     @Override
     public void onDisable() {
         MoneyManager.save();
+        hookIntoVault.unhook();
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return true;
     }
 
     @Override
@@ -65,7 +101,7 @@ public final class Uconomy extends JavaPlugin {
                                     for (String checkMyMoneyMessages : checkMyMoneyMessageList) {
                                         String translatedMessages = checkMyMoneyMessages
                                                 .replace("%name_of_player%", player.getName())
-                                                .replace("%player_money%", df.format(MoneyManager.get().getLong("player." + player.getUniqueId())));
+                                                .replace("%player_money%", df.format(economyManager.getBalance(player.getName())));
                                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                     }
                                     break;
@@ -300,5 +336,17 @@ public final class Uconomy extends JavaPlugin {
             e.printStackTrace();
             getLogger().info("messages.yml에서 메시지를 불러오는 도중 문제가 발생했습니다.");
         }
+    }
+
+    public static Economy getEconomy() {
+        return econ;
+    }
+
+    public static Permission getPermissions() {
+        return perms;
+    }
+
+    public static Chat getChat() {
+        return chat;
     }
 }
