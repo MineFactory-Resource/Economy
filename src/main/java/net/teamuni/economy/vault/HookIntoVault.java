@@ -12,11 +12,11 @@ public class HookIntoVault {
     public void hook() {
         provider = plugin.economyManager;
         Bukkit.getServicesManager().register(Economy.class, provider, this.plugin, ServicePriority.High);
-        Bukkit.getLogger().info("Vault is hooked into " + plugin.getName() + " sucessfully!");
+        Bukkit.getLogger().info("[Uconomy] Vault is hooked into " + plugin.getName() + " sucessfully!");
     }
 
     public void unhook() {
         Bukkit.getServicesManager().unregister(Economy.class, this.provider);
-        Bukkit.getLogger().info("Vault is unhooked from " + plugin.getName() + " sucessfully!");
+        Bukkit.getLogger().info("[Uconomy] Vault is unhooked from " + plugin.getName() + " sucessfully!");
     }
 }
