@@ -23,7 +23,7 @@ public final class Uconomy extends JavaPlugin {
     List<String> opCommandGuideMessageList;
     List<String> notAvailableCommandMessageList;
     List<String> incorrectPlayerNameMessageList;
-    List<String> invaildSyntaxMessageList;
+    List<String> invalidSyntaxMessageList;
     List<String> moneyShortageMessageList;
     List<String> attemptToDepositToOneselfMessageList;
     List<String> checkMyMoneyMessageList;
@@ -142,7 +142,7 @@ public final class Uconomy extends JavaPlugin {
                                                 }
                                             }
                                         } else {
-                                            for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
+                                            for (String invalidSyntaxMessages : invalidSyntaxMessageList) {
                                                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
                                             }
                                         }
@@ -176,7 +176,7 @@ public final class Uconomy extends JavaPlugin {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                         }
                                     } else {
-                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
+                                        for (String invalidSyntaxMessages : invalidSyntaxMessageList) {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
                                         }
                                     }
@@ -209,7 +209,7 @@ public final class Uconomy extends JavaPlugin {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                         }
                                     } else {
-                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
+                                        for (String invalidSyntaxMessages : invalidSyntaxMessageList) {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
                                         }
                                     }
@@ -237,7 +237,7 @@ public final class Uconomy extends JavaPlugin {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                         }
                                     } else {
-                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
+                                        for (String invalidSyntaxMessages : invalidSyntaxMessageList) {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
                                         }
                                     }
@@ -294,7 +294,7 @@ public final class Uconomy extends JavaPlugin {
             opCommandGuideMessageList = MessageManager.get().getStringList("money_command_guide_for_op");
             notAvailableCommandMessageList = MessageManager.get().getStringList("not_available_command");
             incorrectPlayerNameMessageList = MessageManager.get().getStringList("incorrect_player_name");
-            invaildSyntaxMessageList = MessageManager.get().getStringList("invaild_syntax");
+            invalidSyntaxMessageList = MessageManager.get().getStringList("invalid_syntax");
             moneyShortageMessageList = MessageManager.get().getStringList("money_shortage");
             attemptToDepositToOneselfMessageList = MessageManager.get().getStringList("attempt_to_deposit_to_oneself");
             checkMyMoneyMessageList = MessageManager.get().getStringList("check_my_money");
