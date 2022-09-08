@@ -74,7 +74,7 @@ public final class Uconomy extends JavaPlugin {
                                 case 2:
                                     if (player.hasPermission("ucon.manage")) {
                                         OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-                                        if (target != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(target.getUniqueId().toString())) {
+                                        if (target != null && MoneyManager.get().getConfigurationSection("player").isString(target.getUniqueId().toString())) {
                                             for (String checkTheOtherPlayerMoneyMessages : checkTheOtherPlayerMoneyMessageList) {
                                                 String translatedMessages = checkTheOtherPlayerMoneyMessages
                                                         .replace("%name_of_player%", target.getName())
@@ -102,7 +102,7 @@ public final class Uconomy extends JavaPlugin {
                         case "보내기":
                             if (args.length == 3) {
                                 OfflinePlayer recipient = Bukkit.getOfflinePlayerIfCached(args[1]);
-                                if (recipient != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(recipient.getUniqueId().toString())) {
+                                if (recipient != null && MoneyManager.get().getConfigurationSection("player").isString(recipient.getUniqueId().toString())) {
                                     if (recipient != player) {
                                         if (args[2].matches("[0-9]+")) {
                                             if (MoneyManager.get().getLong("player." + player.getUniqueId()) >= Long.parseLong(args[2])) {
@@ -165,7 +165,7 @@ public final class Uconomy extends JavaPlugin {
                         case "지급":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
                                 OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-                                if (target != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(target.getUniqueId().toString())) {
+                                if (target != null && MoneyManager.get().getConfigurationSection("player").isString(target.getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         long increasedPlayerMoney = MoneyManager.get().getLong("player." + target.getUniqueId()) + Long.parseLong(args[2]);
                                         MoneyManager.get().set("player." + Bukkit.getOfflinePlayer(args[1]).getUniqueId(), increasedPlayerMoney);
@@ -194,7 +194,7 @@ public final class Uconomy extends JavaPlugin {
                         case "차감":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
                                 OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-                                if (target != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(target.getUniqueId().toString())) {
+                                if (target != null && MoneyManager.get().getConfigurationSection("player").isString(target.getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         long decreasedPlayerMoney = MoneyManager.get().getLong("player." + target.getUniqueId()) - Long.parseLong(args[2]);
                                         if (decreasedPlayerMoney < 0) {
@@ -227,7 +227,7 @@ public final class Uconomy extends JavaPlugin {
                         case "설정":
                             if (player.hasPermission("ucon.manage") && args.length == 3) {
                                 OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-                                if (target != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(target.getUniqueId().toString())) {
+                                if (target != null && MoneyManager.get().getConfigurationSection("player").isString(target.getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         MoneyManager.get().set("player." + target.getUniqueId(), Long.parseLong(args[2]));
                                         for (String setPlayerMoneyMessages : setPlayerMoneyMessageList) {
