@@ -168,7 +168,7 @@ public final class Uconomy extends JavaPlugin {
                                 if (target != null && MoneyManager.get().getConfigurationSection("player").isSet(target.getUniqueId().toString())) {
                                     if (args[2].matches("[0-9]+")) {
                                         long increasedPlayerMoney = MoneyManager.get().getLong("player." + target.getUniqueId()) + Long.parseLong(args[2]);
-                                        MoneyManager.get().set("player." + Bukkit.getOfflinePlayer(args[1]).getUniqueId(), increasedPlayerMoney);
+                                        MoneyManager.get().set("player." + target.getUniqueId(), increasedPlayerMoney);
                                         for (String increasePlayerMoneyMessages : increasePlayerMoneyMessageList) {
                                             String translatedMessages = increasePlayerMoneyMessages
                                                     .replace("%name_of_player%", target.getName())
