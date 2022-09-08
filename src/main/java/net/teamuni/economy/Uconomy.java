@@ -274,9 +274,9 @@ public final class Uconomy extends JavaPlugin {
             if (command.getName().equalsIgnoreCase("uconomy") && player.hasPermission("ucon.reload")) {
                 if (args[0].equalsIgnoreCase("reload")) {
                     reloadConfig();
-                    getMessages();
                     MoneyManager.save();
                     MessageManager.reload();
+                    getMessages();
                     for (String reloadMessages : reloadMessageList) {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', reloadMessages));
                     }
