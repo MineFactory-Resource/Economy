@@ -61,7 +61,7 @@ check_the_other_player_money: #다른 플레이어의 돈을 확인할 때 출�
 #거래 후 돈을 보낸 플레이어의 잔액 가져오기: %sender_money_after_transaction%
 transaction_confirm_to_sender: #다른 플레이어에게 돈을 보냈을 때 돈을 보낸 플레이어에게 출력되는 메시지입니다.
   - ""
-  - "&e[알림] &d%name_of_recipient%&f님에게 &6%sent_money%&원을 보냈습니다."
+  - "&e[알림] &d%name_of_recipient%&f님에게 &6%sent_money%&f원을 보냈습니다."
   - "&e[알림] &f잔액: &6%sender_money_after_transaction%&f원"
   - ""
 
@@ -70,7 +70,7 @@ transaction_confirm_to_sender: #다른 플레이어에게 돈을 보냈을 때 �
 #거래 후 돈을 받은 플레이어의 잔액 가져오기: %recipient_money_after_transaction%
 transaction_confirm_to_recipient: #다른 플레이어에게 돈을 보냈을 때 돈을 받은 플레이어에게 출력되는 메시지입니다.
   - ""
-  - "&e[알림] &d%name_of_sender%&f님에게 &6%received_money%&원을 받았습니다."
+  - "&e[알림] &d%name_of_sender%&f님에게 &6%received_money%&f원을 받았습니다."
   - "&e[알림] &f잔액: &6%recipient_money_after_transaction%&f원"
   - ""
 
