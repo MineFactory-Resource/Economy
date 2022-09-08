@@ -124,7 +124,7 @@ public final class Uconomy extends JavaPlugin {
                                                                     .replace("%name_of_sender%", player.getName())
                                                                     .replace("%received_money%", df.format(Long.parseLong(args[2])))
                                                                     .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney));
-                                                            Player onlineRecipient = Bukkit.getPlayer(args[1]);
+                                                            Player onlineRecipient = recipient.getPlayer();
                                                             assert onlineRecipient != null;
                                                             onlineRecipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                                         }
