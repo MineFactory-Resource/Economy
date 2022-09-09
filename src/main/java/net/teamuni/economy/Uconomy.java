@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Objects;
 
 public final class Uconomy extends JavaPlugin {
 
