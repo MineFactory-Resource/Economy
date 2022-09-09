@@ -10,6 +10,7 @@ import net.teamuni.economy.vault.EconomyManager;
 import net.teamuni.economy.vault.HookIntoVault;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -31,7 +32,7 @@ public final class Uconomy extends JavaPlugin {
     List<String> opCommandGuideMessageList;
     List<String> notAvailableCommandMessageList;
     List<String> incorrectPlayerNameMessageList;
-    List<String> invaildSyntaxMessageList;
+    List<String> invalidSyntaxMessageList;
     List<String> moneyShortageMessageList;
     List<String> attemptToDepositToOneselfMessageList;
     List<String> checkMyMoneyMessageList;
@@ -106,24 +107,26 @@ public final class Uconomy extends JavaPlugin {
                                     }
                                     break;
                                 case 2:
-                                    if (player.hasPermission("ucon.manage")) {
-                                        Player target = Bukkit.getPlayer(args[1]);
-                                        if (target != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(target.getUniqueId().toString())) {
-                                            for (String checkTheOtherPlayerMoneyMessages : checkTheOtherPlayerMoneyMessageList) {
-                                                String translatedMessages = checkTheOtherPlayerMoneyMessages
-                                                        .replace("%name_of_player%", target.getName())
-                                                        .replace("%player_money%", df.format(MoneyManager.get().getLong("player." + target.getUniqueId())));
-                                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
-                                            }
-                                        } else {
-                                            for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
-                                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
-                                            }
-                                        }
-                                    } else {
+                                    if (!player.hasPermission("ucon.manage")) {
                                         for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
                                         }
+                                        return false;
+                                    }
+                                    OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
+
+                                    if (target == null || !MoneyManager.get().getConfigurationSection("player").isSet(target.getUniqueId().toString())) {
+                                        for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
+                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
+                                        }
+                                        return false;
+                                    }
+
+                                    for (String checkTheOtherPlayerMoneyMessages : checkTheOtherPlayerMoneyMessageList) {
+                                        String translatedMessages = checkTheOtherPlayerMoneyMessages
+                                                .replace("%name_of_player%", target.getName())
+                                                .replace("%player_money%", df.format(MoneyManager.get().getLong("player." + target.getUniqueId())));
+                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                     }
                                     break;
                                 default:
@@ -134,149 +137,139 @@ public final class Uconomy extends JavaPlugin {
                             }
                             break;
                         case "보내기":
-                            if (args.length == 3) {
-                                Player recipient = Bukkit.getPlayer(args[1]);
-                                if (recipient != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(recipient.getUniqueId().toString())) {
-                                    if (recipient != player) {
-                                        if (args[2].matches("[0-9]+")) {
-                                            if (MoneyManager.get().getLong("player." + player.getUniqueId()) >= Long.parseLong(args[2])) {
-                                                if (Long.parseLong(args[2]) >= getConfig().getLong("minimum_amount")) {
-                                                    long updatedPlayerMoney = MoneyManager.get().getLong("player." + player.getUniqueId()) - Long.parseLong(args[2]);
-                                                    long updatedRecipientMoney = MoneyManager.get().getLong("player." + recipient.getUniqueId()) + Long.parseLong(args[2]);
-                                                    MoneyManager.get().set("player." + player.getUniqueId(), updatedPlayerMoney);
-                                                    MoneyManager.get().set("player." + recipient.getUniqueId(), updatedRecipientMoney);
-                                                    for (String transactionConfirmToSenderMessages : transactionConfirmToSenderMessageList) {
-                                                        String translatedMessages = transactionConfirmToSenderMessages
-                                                                .replace("%name_of_recipient%", recipient.getName())
-                                                                .replace("%sent_money%", df.format(Long.parseLong(args[2])))
-                                                                .replace("%sender_money_after_transaction%", df.format(updatedPlayerMoney));
-                                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
-                                                    }
-                                                    for (String transactionConfirmToRecipientMessages : transactionConfirmToRecipientMessageList) {
-                                                        String translatedMessages = transactionConfirmToRecipientMessages
-                                                                .replace("%name_of_sender%", player.getName())
-                                                                .replace("%received_money%", df.format(Long.parseLong(args[2])))
-                                                                .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney));
-                                                        recipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
-                                                    }
-                                                } else {
-                                                    for (String minimumAmountCautionMessages : minimumAmountCautionMessageList) {
-                                                        String translatedMessages = minimumAmountCautionMessages
-                                                                .replace("%value_of_minimum%", df.format(getConfig().getLong("minimum_amount")));
-                                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
-                                                    }
-                                                }
-                                            } else {
-                                                for (String moneyShortageMessages : moneyShortageMessageList) {
-                                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', moneyShortageMessages));
-                                                }
-                                            }
-                                        } else {
-                                            for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
-                                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
-                                            }
-                                        }
-                                    } else {
-                                        for (String attemptToDepositToOneselfMessages : attemptToDepositToOneselfMessageList) {
-                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', attemptToDepositToOneselfMessages));
-                                        }
-                                    }
-                                } else {
-                                    for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
-                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
-                                    }
-                                }
-                            } else {
+                            if (args.length != 3) {
                                 for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
                                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                                }
+                                return false;
+                            }
+                            OfflinePlayer recipient = Bukkit.getOfflinePlayerIfCached(args[1]);
+
+                            if (recipient == null || !MoneyManager.get().getConfigurationSection("player").isSet(recipient.getUniqueId().toString())) {
+                                for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
+                                }
+                                return false;
+                            }
+                            if (recipient == player) {
+                                for (String attemptToDepositToOneselfMessages : attemptToDepositToOneselfMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', attemptToDepositToOneselfMessages));
+                                }
+                                return false;
+                            }
+                            if (!args[2].matches("[0-9]+")) {
+                                for (String invalidSyntaxMessages : invalidSyntaxMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
+                                }
+                                return false;
+                            }
+                            if (MoneyManager.get().getLong("player." + player.getUniqueId()) < Long.parseLong(args[2])) {
+                                for (String moneyShortageMessages : moneyShortageMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', moneyShortageMessages));
+                                }
+                                return false;
+                            }
+                            if (Long.parseLong(args[2]) < getConfig().getLong("minimum_amount")) {
+                                for (String minimumAmountCautionMessages : minimumAmountCautionMessageList) {
+                                    String translatedMessages = minimumAmountCautionMessages
+                                            .replace("%value_of_minimum%", df.format(getConfig().getLong("minimum_amount")));
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                }
+                                return false;
+                            }
+                            long updatedPlayerMoney = MoneyManager.get().getLong("player." + player.getUniqueId()) - Long.parseLong(args[2]);
+                            long updatedRecipientMoney = MoneyManager.get().getLong("player." + recipient.getUniqueId()) + Long.parseLong(args[2]);
+                            MoneyManager.get().set("player." + player.getUniqueId(), updatedPlayerMoney);
+                            MoneyManager.get().set("player." + recipient.getUniqueId(), updatedRecipientMoney);
+
+                            for (String transactionConfirmToSenderMessages : transactionConfirmToSenderMessageList) {
+                                String translatedMessages = transactionConfirmToSenderMessages
+                                        .replace("%name_of_recipient%", recipient.getName())
+                                        .replace("%sent_money%", df.format(Long.parseLong(args[2])))
+                                        .replace("%sender_money_after_transaction%", df.format(updatedPlayerMoney));
+                                player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                            }
+
+                            if (recipient.isOnline()) {
+                                for (String transactionConfirmToRecipientMessages : transactionConfirmToRecipientMessageList) {
+                                    String translatedMessages = transactionConfirmToRecipientMessages
+                                            .replace("%name_of_sender%", player.getName())
+                                            .replace("%received_money%", df.format(Long.parseLong(args[2])))
+                                            .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney));
+                                    Player onlineRecipient = recipient.getPlayer();
+                                    assert onlineRecipient != null;
+                                    onlineRecipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                 }
                             }
                             break;
                         case "지급":
-                            if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
-                                    if (args[2].matches("[0-9]+")) {
-                                        long increasedPlayerMoney = MoneyManager.get().getLong("player." + Bukkit.getPlayer(args[1]).getUniqueId()) + Long.parseLong(args[2]);
-                                        MoneyManager.get().set("player." + Bukkit.getPlayer(args[1]).getUniqueId(), increasedPlayerMoney);
-                                        for (String increasePlayerMoneyMessages : increasePlayerMoneyMessageList) {
-                                            String translatedMessages = increasePlayerMoneyMessages
-                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
-                                                    .replace("%increased_money%", df.format(Long.parseLong(args[2])));
-                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
-                                        }
-                                    } else {
-                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
-                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
-                                        }
-                                    }
-                                } else {
-                                    for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
-                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
-                                    }
-                                }
-                            } else {
-                                for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
-                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
-                                }
-                            }
-                            break;
                         case "차감":
-                            if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
-                                    if (args[2].matches("[0-9]+")) {
-                                        long decreasedPlayerMoney = MoneyManager.get().getLong("player." + Bukkit.getPlayer(args[1]).getUniqueId()) - Long.parseLong(args[2]);
-                                        if (decreasedPlayerMoney < 0) {
-                                            MoneyManager.get().set("player." + Bukkit.getPlayer(args[1]).getUniqueId(), 0);
-                                        } else {
-                                            MoneyManager.get().set("player." + Bukkit.getPlayer(args[1]).getUniqueId(), decreasedPlayerMoney);
-                                        }
-                                        for (String decreasePlayerMoneyMessages : decreasePlayerMoneyMessageList) {
-                                            String translatedMessages = decreasePlayerMoneyMessages
-                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
-                                                    .replace("%decreased_money%", df.format(Long.parseLong(args[2])));
-                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
-                                        }
-                                    } else {
-                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
-                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
-                                        }
-                                    }
-                                } else {
-                                    for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
-                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
-                                    }
-                                }
-                            } else {
-                                for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
-                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
-                                }
-                            }
-                            break;
                         case "설정":
-                            if (player.hasPermission("ucon.manage") && args.length == 3) {
-                                if (Bukkit.getPlayer(args[1]) != null && MoneyManager.get().getConfigurationSection("player").getKeys(false).contains(Bukkit.getPlayer(args[1]).getUniqueId().toString())) {
-                                    if (args[2].matches("[0-9]+")) {
-                                        MoneyManager.get().set("player." + Bukkit.getPlayer(args[1]).getUniqueId(), Long.parseLong(args[2]));
-                                        for (String setPlayerMoneyMessages : setPlayerMoneyMessageList) {
-                                            String translatedMessages = setPlayerMoneyMessages
-                                                    .replace("%name_of_player%", Bukkit.getPlayer(args[1]).getName())
-                                                    .replace("%set_money%", df.format(Long.parseLong(args[2])));
-                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
-                                        }
-                                    } else {
-                                        for (String invalidSyntaxMessages : invaildSyntaxMessageList) {
-                                            player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
-                                        }
-                                    }
-                                } else {
-                                    for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
-                                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
-                                    }
-                                }
-                            } else {
+                            if (!player.hasPermission("ucon.manage")) {
                                 for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
                                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
                                 }
+                                return false;
+                            }
+                            if (args.length != 3) {
+                                for (String notAvailableCommandMessages : notAvailableCommandMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', notAvailableCommandMessages));
+                                }
+                                return false;
+                            }
+                            OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
+
+                            if (target == null || !MoneyManager.get().getConfigurationSection("player").isSet(target.getUniqueId().toString())) {
+                                for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
+                                }
+                                return false;
+                            }
+                            if (!args[2].matches("[0-9]+")) {
+                                for (String invalidSyntaxMessages : invalidSyntaxMessageList) {
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidSyntaxMessages));
+                                }
+                                return false;
+                            }
+                            if (args[0].equalsIgnoreCase("지급")) {
+                                long increasedPlayerMoney = MoneyManager.get().getLong("player." + target.getUniqueId()) + Long.parseLong(args[2]);
+                                MoneyManager.get().set("player." + target.getUniqueId(), increasedPlayerMoney);
+
+                                for (String increasePlayerMoneyMessages : increasePlayerMoneyMessageList) {
+                                    String translatedMessages = increasePlayerMoneyMessages
+                                            .replace("%name_of_player%", target.getName())
+                                            .replace("%increased_money%", df.format(Long.parseLong(args[2])));
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                }
+                                return false;
+                            }
+                            if (args[0].equalsIgnoreCase("차감")) {
+                                long decreasedPlayerMoney = MoneyManager.get().getLong("player." + target.getUniqueId()) - Long.parseLong(args[2]);
+
+                                if (decreasedPlayerMoney < 0) {
+                                    MoneyManager.get().set("player." + target.getUniqueId(), 0);
+                                } else {
+                                    MoneyManager.get().set("player." + target.getUniqueId(), decreasedPlayerMoney);
+                                }
+
+                                for (String decreasePlayerMoneyMessages : decreasePlayerMoneyMessageList) {
+                                    String translatedMessages = decreasePlayerMoneyMessages
+                                            .replace("%name_of_player%", target.getName())
+                                            .replace("%decreased_money%", df.format(Long.parseLong(args[2])));
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                }
+                                return false;
+                            }
+                            if (args[0].equalsIgnoreCase("설정")) {
+                                MoneyManager.get().set("player." + target.getUniqueId(), Long.parseLong(args[2]));
+
+                                for (String setPlayerMoneyMessages : setPlayerMoneyMessageList) {
+                                    String translatedMessages = setPlayerMoneyMessages
+                                            .replace("%name_of_player%", target.getName())
+                                            .replace("%set_money%", df.format(Long.parseLong(args[2])));
+                                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
+                                }
+                                return false;
                             }
                             break;
                         default:
@@ -298,18 +291,16 @@ public final class Uconomy extends JavaPlugin {
                 }
                 return false;
             }
-            if (command.getName().equalsIgnoreCase("uconomy") && player.hasPermission("ucon.reload")) {
-                if (args[0].equalsIgnoreCase("reload")) {
-                    reloadConfig();
-                    getMessages();
-                    MoneyManager.save();
-                    MessageManager.reload();
-                    for (String reloadMessages : reloadMessageList) {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', reloadMessages));
-                    }
+            if (command.getName().equalsIgnoreCase("uconomy") && args[0].equalsIgnoreCase("reload") && player.hasPermission("ucon.reload")) {
+                reloadConfig();
+                MoneyManager.save();
+                MessageManager.reload();
+                getMessages();
+                for (String reloadMessages : reloadMessageList) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', reloadMessages));
                 }
-                return false;
             }
+            return false;
         }
         return false;
     }
@@ -321,7 +312,7 @@ public final class Uconomy extends JavaPlugin {
             opCommandGuideMessageList = MessageManager.get().getStringList("money_command_guide_for_op");
             notAvailableCommandMessageList = MessageManager.get().getStringList("not_available_command");
             incorrectPlayerNameMessageList = MessageManager.get().getStringList("incorrect_player_name");
-            invaildSyntaxMessageList = MessageManager.get().getStringList("invaild_syntax");
+            invalidSyntaxMessageList = MessageManager.get().getStringList("invalid_syntax");
             moneyShortageMessageList = MessageManager.get().getStringList("money_shortage");
             attemptToDepositToOneselfMessageList = MessageManager.get().getStringList("attempt_to_deposit_to_oneself");
             checkMyMoneyMessageList = MessageManager.get().getStringList("check_my_money");
