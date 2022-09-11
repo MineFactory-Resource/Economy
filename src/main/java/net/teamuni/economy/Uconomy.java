@@ -1,8 +1,6 @@
 package net.teamuni.economy;
 
-import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.permission.Permission;
 import net.teamuni.economy.config.MessageManager;
 import net.teamuni.economy.data.MoneyManager;
 import net.teamuni.economy.event.JoinEvent;
@@ -46,10 +44,6 @@ public final class Uconomy extends JavaPlugin {
 
     DecimalFormat df = new DecimalFormat("###,###");
 
-    private static Economy econ = null;
-    private static Permission perms = null;
-    private static Chat chat = null;
-
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -84,7 +78,7 @@ public final class Uconomy extends JavaPlugin {
         if (rsp == null) {
             return false;
         }
-        econ = rsp.getProvider();
+        Economy econ = rsp.getProvider();
         return true;
     }
 
@@ -327,17 +321,5 @@ public final class Uconomy extends JavaPlugin {
             e.printStackTrace();
             getLogger().info("messages.yml에서 메시지를 불러오는 도중 문제가 발생했습니다.");
         }
-    }
-
-    public static Economy getEconomy() {
-        return econ;
-    }
-
-    public static Permission getPermissions() {
-        return perms;
-    }
-
-    public static Chat getChat() {
-        return chat;
     }
 }
