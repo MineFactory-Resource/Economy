@@ -75,11 +75,7 @@ public final class Uconomy extends JavaPlugin {
             return false;
         }
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
-        Economy econ = rsp.getProvider();
-        return true;
+        return rsp != null;
     }
 
     @Override
