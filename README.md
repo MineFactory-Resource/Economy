@@ -7,7 +7,7 @@
 ### Tested Paper Version:
 1.18.2
 ### Required Plugin:
-None
+- Vault
 ## Install Guide
 1. 최신 버전의 플러그인 파일을 다운로드합니다.
 2. 다운로드한 *.jar 파일을 플러그인 디렉토리에 저장합니다.
