@@ -9,6 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.*;
 
 @Getter
@@ -37,7 +38,21 @@ public class EconomyManager implements Economy {
 
     @Override
     public String format(double amount) {
-        return null;
+        DecimalFormat df = new DecimalFormat("#,####");
+        StringBuilder result = new StringBuilder();
+
+        String[] unit = {"", "만", "억", "조", "경"};
+        long number = (long) amount;
+        int count = 0;
+        String[] numberForm = df.format(number).split(",");
+
+        for (int i = numberForm.length; i > 0; i--) {
+            if (Long.parseLong(numberForm[i - 1]) != 0) {
+                result.insert(0, Long.parseLong(numberForm[i - 1]) + unit[count]);
+            }
+            count++;
+        }
+        return result.toString();
     }
 
     @Override
