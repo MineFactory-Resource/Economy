@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.List;
 
 @Getter
@@ -25,7 +26,8 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasBankSupport() {
-        return false;
+        File file = new File(Bukkit.getPluginManager().getPlugin("Uconomy").getDataFolder(), "moneydata.yml");
+        return file.exists();
     }
 
     @Override
@@ -55,7 +57,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player) {
-        return false;
+        return MoneyManager.get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
     }
 
     @Deprecated
@@ -65,7 +67,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player, String worldName) {
-        return false;
+        return MoneyManager.get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
     }
 
     @Deprecated
