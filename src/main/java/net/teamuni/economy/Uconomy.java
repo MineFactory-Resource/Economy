@@ -1,5 +1,6 @@
 package net.teamuni.economy;
 
+import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import net.teamuni.economy.config.MessageManager;
 import net.teamuni.economy.data.MoneyManager;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
 import java.util.List;
 
+@Getter
 public final class Uconomy extends JavaPlugin {
 
     private static Uconomy instance;
