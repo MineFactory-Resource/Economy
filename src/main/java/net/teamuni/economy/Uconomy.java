@@ -25,7 +25,7 @@ public final class Uconomy extends JavaPlugin {
 
     private static Uconomy instance;
     private static EconomyManager manager;
-    private HookIntoVault hookIntoVault;
+    private static HookIntoVault hookIntoVault;
 
     public static Uconomy getInstance() {
         return instance;
