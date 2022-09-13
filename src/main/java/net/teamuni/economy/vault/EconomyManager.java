@@ -12,6 +12,7 @@ import java.util.List;
 
 @Getter
 public class EconomyManager implements Economy {
+
     @Override
     public boolean isEnabled() {
         return false;
@@ -19,7 +20,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public String getName() {
-        return null;
+        return Thread.currentThread().getStackTrace()[2].getMethodName();
     }
 
     @Override
@@ -48,7 +49,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public boolean hasAccount(String playerName) {
         return false;
     }
@@ -59,7 +59,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public boolean hasAccount(String playerName, String worldName) {
         return false;
     }
@@ -70,7 +69,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public double getBalance(String playerName) {
         Player player = Bukkit.getPlayer(playerName);
         assert player != null;
@@ -85,7 +83,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public double getBalance(String playerName, String world) {
         Player player = Bukkit.getPlayer(playerName);
         assert player != null;
@@ -100,7 +97,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public boolean has(String playerName, double amount) {
         return false;
     }
@@ -111,7 +107,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public boolean has(String playerName, String worldName, double amount) {
         return false;
     }
@@ -122,7 +117,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
         return null;
     }
@@ -133,7 +127,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public EconomyResponse withdrawPlayer(String playerName, String worldName, double amount) {
         return null;
     }
@@ -144,7 +137,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public EconomyResponse depositPlayer(String playerName, double amount) {
         return null;
     }
@@ -155,7 +147,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
         return null;
     }
@@ -166,7 +157,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public EconomyResponse createBank(String name, String player) {
         return null;
     }
@@ -202,7 +192,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public EconomyResponse isBankOwner(String name, String playerName) {
         return null;
     }
@@ -213,7 +202,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public EconomyResponse isBankMember(String name, String playerName) {
         return null;
     }
@@ -229,7 +217,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public boolean createPlayerAccount(String playerName) {
         return false;
     }
@@ -240,7 +227,6 @@ public class EconomyManager implements Economy {
     }
 
     @Deprecated
-    @Override
     public boolean createPlayerAccount(String playerName, String worldName) {
         return false;
     }
