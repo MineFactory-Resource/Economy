@@ -225,6 +225,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
+        MoneyManager.get().set("player." + player.getUniqueId(), 0);
         return false;
     }
 
@@ -235,6 +236,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player, String worldName) {
+        MoneyManager.get().set("player." + player.getUniqueId(), 0);
         return false;
     }
 }
