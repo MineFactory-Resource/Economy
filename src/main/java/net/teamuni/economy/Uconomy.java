@@ -21,9 +21,13 @@ import java.util.List;
 
 public final class Uconomy extends JavaPlugin {
 
-    public static Uconomy getInstance;
+    private static Uconomy instance;
     public EconomyManager economyManager;
     private HookIntoVault hookIntoVault;
+
+    public static Uconomy getInstance() {
+        return instance;
+    }
 
     List<String> reloadMessageList;
     List<String> commandGuideMessageList;
@@ -53,7 +57,7 @@ public final class Uconomy extends JavaPlugin {
         getCommand("돈").setTabCompleter(new CommandTabCompleter());
         getCommand("uconomy").setTabCompleter(new CommandTabCompleter());
         getMessages();
-        getInstance = this;
+        instance = this;
         economyManager = new EconomyManager();
         hookIntoVault = new HookIntoVault();
         hookIntoVault.hook();

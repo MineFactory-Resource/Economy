@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 
 public class HookIntoVault {
-    private final Uconomy plugin = Uconomy.getInstance;
+    private final Uconomy plugin = Uconomy.getInstance();
     private Economy provider;
 
     public void hook() {
