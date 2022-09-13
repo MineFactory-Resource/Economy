@@ -9,7 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.util.List;
+import java.util.*;
 
 @Getter
 public class EconomyManager implements Economy {
@@ -215,7 +215,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public List<String> getBanks() {
-        return null;
+        return Collections.singletonList(MoneyManager.get().getConfigurationSection("player").getKeys(false).toString());
     }
 
     @Deprecated
