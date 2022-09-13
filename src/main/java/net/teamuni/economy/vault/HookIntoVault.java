@@ -7,10 +7,11 @@ import org.bukkit.plugin.ServicePriority;
 
 public class HookIntoVault {
     private final Uconomy plugin = Uconomy.getInstance();
+    private final EconomyManager econ = Uconomy.getEconomyManager();
     private Economy provider;
 
     public void hook() {
-        provider = plugin.economyManager;
+        provider = econ;
         Bukkit.getServicesManager().register(Economy.class, provider, this.plugin, ServicePriority.High);
         Bukkit.getLogger().info("[Uconomy] Vault is hooked into " + plugin.getName() + " sucessfully!");
     }
