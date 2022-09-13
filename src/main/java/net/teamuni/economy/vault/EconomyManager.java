@@ -1,5 +1,6 @@
 package net.teamuni.economy.vault;
 
+import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.teamuni.economy.data.MoneyManager;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
+@Getter
 public class EconomyManager implements Economy {
     @Override
     public boolean isEnabled() {
