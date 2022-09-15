@@ -177,16 +177,14 @@ public final class Uconomy extends JavaPlugin {
                                 }
                                 return false;
                             }
-                            long updatedPlayerMoney = (long) getEconomyManager().getBalance(player) - Long.parseLong(args[2]);
-                            long updatedRecipientMoney = (long) getEconomyManager().getBalance(recipient) + Long.parseLong(args[2]);
-                            MoneyManager.get().set("player." + player.getUniqueId(), updatedPlayerMoney);
-                            MoneyManager.get().set("player." + recipient.getUniqueId(), updatedRecipientMoney);
+                            getEconomyManager().withdrawPlayer(player, Double.parseDouble(args[2]));
+                            getEconomyManager().depositPlayer(recipient, Double.parseDouble(args[2]));
 
                             for (String transactionConfirmToSenderMessages : transactionConfirmToSenderMessageList) {
                                 String translatedMessages = transactionConfirmToSenderMessages
                                         .replace("%name_of_recipient%", recipient.getName())
                                         .replace("%sent_money%", df.format(Long.parseLong(args[2])))
-                                        .replace("%sender_money_after_transaction%", df.format(updatedPlayerMoney));
+                                        .replace("%sender_money_after_transaction%", df.format(getEconomyManager().getBalance(player)));
                                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                             }
 
@@ -195,7 +193,7 @@ public final class Uconomy extends JavaPlugin {
                                     String translatedMessages = transactionConfirmToRecipientMessages
                                             .replace("%name_of_sender%", player.getName())
                                             .replace("%received_money%", df.format(Long.parseLong(args[2])))
-                                            .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney));
+                                            .replace("%recipient_money_after_transaction%", df.format(getEconomyManager().getBalance(recipient)));
                                     Player onlineRecipient = recipient.getPlayer();
                                     assert onlineRecipient != null;
                                     onlineRecipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
@@ -232,8 +230,7 @@ public final class Uconomy extends JavaPlugin {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("지급")) {
-                                long increasedPlayerMoney = (long) getEconomyManager().getBalance(target) + Long.parseLong(args[2]);
-                                MoneyManager.get().set("player." + target.getUniqueId(), increasedPlayerMoney);
+                                getEconomyManager().depositPlayer(target, Double.parseDouble(args[2]));
 
                                 for (String increasePlayerMoneyMessages : increasePlayerMoneyMessageList) {
                                     String translatedMessages = increasePlayerMoneyMessages
@@ -249,7 +246,7 @@ public final class Uconomy extends JavaPlugin {
                                 if (decreasedPlayerMoney < 0) {
                                     MoneyManager.get().set("player." + target.getUniqueId(), 0);
                                 } else {
-                                    MoneyManager.get().set("player." + target.getUniqueId(), decreasedPlayerMoney);
+                                    getEconomyManager().withdrawPlayer(target, Double.parseDouble(args[2]));
                                 }
 
                                 for (String decreasePlayerMoneyMessages : decreasePlayerMoneyMessageList) {
