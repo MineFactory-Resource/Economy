@@ -20,7 +20,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public String getName() {
-        return Thread.currentThread().getStackTrace()[2].getMethodName();
+        return null;
     }
 
     @Override
