@@ -138,7 +138,13 @@ public class EconomyManager implements Economy {
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer player, double amount) {
-        return null;
+        if (!hasAccount(player)) {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
+        }
+        double withdrawedMoney = getBalance(player) - amount;
+        MoneyManager.get().set("player." + player.getUniqueId(), withdrawedMoney);
+
+        return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
     @Deprecated
@@ -148,7 +154,13 @@ public class EconomyManager implements Economy {
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer player, String worldName, double amount) {
-        return null;
+        if (!hasAccount(player)) {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
+        }
+        double withdrawedMoney = getBalance(player) - amount;
+        MoneyManager.get().set("player." + player.getUniqueId(), withdrawedMoney);
+
+        return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
     @Deprecated
@@ -158,7 +170,13 @@ public class EconomyManager implements Economy {
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer player, double amount) {
-        return null;
+        if (!hasAccount(player)) {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
+        }
+        double depositedMoney = getBalance(player) + amount;
+        MoneyManager.get().set("player." + player.getUniqueId(), depositedMoney);
+
+        return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
     @Deprecated
@@ -168,7 +186,13 @@ public class EconomyManager implements Economy {
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer player, String worldName, double amount) {
-        return null;
+        if (!hasAccount(player)) {
+            return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
+        }
+        double depositedMoney = getBalance(player) + amount;
+        MoneyManager.get().set("player." + player.getUniqueId(), depositedMoney);
+
+        return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
     @Deprecated
