@@ -1,6 +1,6 @@
 package net.teamuni.economy.event;
 
-import net.teamuni.economy.data.MoneyManager;
+import net.teamuni.economy.Uconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,8 +15,8 @@ public class JoinEvent implements Listener {
         Player player = event.getPlayer();
         String playerUuid = player.getUniqueId().toString();
 
-        if (!MoneyManager.get().getConfigurationSection("player").isSet(playerUuid)) {
-            MoneyManager.get().set("player." + playerUuid, 0);
+        if (!Uconomy.getEconomyManager().hasAccount(player)) {
+            Uconomy.getEconomyManager().createPlayerAccount(player);
             Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
         }
     }
