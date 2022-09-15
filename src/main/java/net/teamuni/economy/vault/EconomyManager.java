@@ -1,6 +1,5 @@
 package net.teamuni.economy.vault;
 
-import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.teamuni.economy.data.MoneyManager;
@@ -12,7 +11,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.*;
 
-@Getter
 public class EconomyManager implements Economy {
 
     @Override
