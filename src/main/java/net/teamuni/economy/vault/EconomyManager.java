@@ -142,7 +142,7 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double withdrawedMoney = getBalance(player) - amount;
-        MoneyManager.get().set("player." + player.getUniqueId(), withdrawedMoney);
+        MoneyManager.get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
 
         return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
@@ -158,7 +158,7 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double withdrawedMoney = getBalance(player) - amount;
-        MoneyManager.get().set("player." + player.getUniqueId(), withdrawedMoney);
+        MoneyManager.get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
 
         return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
@@ -174,7 +174,7 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double depositedMoney = getBalance(player) + amount;
-        MoneyManager.get().set("player." + player.getUniqueId(), depositedMoney);
+        MoneyManager.get().set("player." + player.getUniqueId(), (long) depositedMoney);
 
         return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
@@ -190,7 +190,7 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double depositedMoney = getBalance(player) + amount;
-        MoneyManager.get().set("player." + player.getUniqueId(), depositedMoney);
+        MoneyManager.get().set("player." + player.getUniqueId(), (long) depositedMoney);
 
         return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
