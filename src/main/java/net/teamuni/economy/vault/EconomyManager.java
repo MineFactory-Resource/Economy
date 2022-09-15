@@ -118,7 +118,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean has(OfflinePlayer player, double amount) {
-        return getBalance(player) > (long) amount;
+        return getBalance(player) >= (long) amount;
     }
 
     @Deprecated
@@ -128,7 +128,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean has(OfflinePlayer player, String worldName, double amount) {
-        return getBalance(player) > (long) amount;
+        return getBalance(player) >= (long) amount;
     }
 
     @Deprecated
