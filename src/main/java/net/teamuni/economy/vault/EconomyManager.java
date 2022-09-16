@@ -251,7 +251,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public List<String> getBanks() {
-        return Collections.singletonList(MoneyManager.get().getConfigurationSection("player").getKeys(false).toString());
+        return null;
     }
 
     @Deprecated
