@@ -1,21 +1,39 @@
 package net.teamuni.economy;
 
+import lombok.Getter;
+import net.milkbowl.vault.economy.Economy;
 import net.teamuni.economy.config.MessageManager;
 import net.teamuni.economy.data.MoneyManager;
 import net.teamuni.economy.event.JoinEvent;
+import net.teamuni.economy.vault.EconomyManager;
+import net.teamuni.economy.vault.HookIntoVault;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
+@Getter
 public final class Uconomy extends JavaPlugin {
+
+    private static Uconomy instance;
+    private static EconomyManager manager;
+    private static HookIntoVault hookIntoVault;
+
+    public static Uconomy getInstance() {
+        return instance;
+    }
+
+    public static EconomyManager getEconomyManager() {
+        return manager;
+    }
 
     List<String> reloadMessageList;
     List<String> commandGuideMessageList;
@@ -45,11 +63,29 @@ public final class Uconomy extends JavaPlugin {
         getCommand("돈").setTabCompleter(new CommandTabCompleter());
         getCommand("uconomy").setTabCompleter(new CommandTabCompleter());
         getMessages();
+        instance = this;
+        manager = new EconomyManager();
+        hookIntoVault = new HookIntoVault();
+        hookIntoVault.hook();
+
+        if (!setupEconomy()) {
+            getLogger().info("Disabled due to no Vault dependency found!");
+            getServer().getPluginManager().disablePlugin(this);
+        }
     }
 
     @Override
     public void onDisable() {
         MoneyManager.save();
+        hookIntoVault.unhook();
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        return rsp != null;
     }
 
     @Override
@@ -66,7 +102,7 @@ public final class Uconomy extends JavaPlugin {
                                     for (String checkMyMoneyMessages : checkMyMoneyMessageList) {
                                         String translatedMessages = checkMyMoneyMessages
                                                 .replace("%name_of_player%", player.getName())
-                                                .replace("%player_money%", df.format(MoneyManager.get().getLong("player." + player.getUniqueId())));
+                                                .replace("%player_money%", df.format(getEconomyManager().getBalance(player)));
                                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                     }
                                     break;
@@ -79,7 +115,7 @@ public final class Uconomy extends JavaPlugin {
                                     }
                                     OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                                    if (target == null || !MoneyManager.get().getConfigurationSection("player").isSet(target.getUniqueId().toString())) {
+                                    if (target == null || !getEconomyManager().hasAccount(target)) {
                                         for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
                                             player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
                                         }
@@ -89,7 +125,7 @@ public final class Uconomy extends JavaPlugin {
                                     for (String checkTheOtherPlayerMoneyMessages : checkTheOtherPlayerMoneyMessageList) {
                                         String translatedMessages = checkTheOtherPlayerMoneyMessages
                                                 .replace("%name_of_player%", target.getName())
-                                                .replace("%player_money%", df.format(MoneyManager.get().getLong("player." + target.getUniqueId())));
+                                                .replace("%player_money%", df.format(getEconomyManager().getBalance(target)));
                                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                                     }
                                     break;
@@ -109,7 +145,7 @@ public final class Uconomy extends JavaPlugin {
                             }
                             OfflinePlayer recipient = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                            if (recipient == null || !MoneyManager.get().getConfigurationSection("player").isSet(recipient.getUniqueId().toString())) {
+                            if (recipient == null || !getEconomyManager().hasAccount(recipient)) {
                                 for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
                                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
                                 }
@@ -127,7 +163,7 @@ public final class Uconomy extends JavaPlugin {
                                 }
                                 return false;
                             }
-                            if (MoneyManager.get().getLong("player." + player.getUniqueId()) < Long.parseLong(args[2])) {
+                            if (!getEconomyManager().has(player, Double.parseDouble(args[2]))) {
                                 for (String moneyShortageMessages : moneyShortageMessageList) {
                                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', moneyShortageMessages));
                                 }
@@ -141,16 +177,14 @@ public final class Uconomy extends JavaPlugin {
                                 }
                                 return false;
                             }
-                            long updatedPlayerMoney = MoneyManager.get().getLong("player." + player.getUniqueId()) - Long.parseLong(args[2]);
-                            long updatedRecipientMoney = MoneyManager.get().getLong("player." + recipient.getUniqueId()) + Long.parseLong(args[2]);
-                            MoneyManager.get().set("player." + player.getUniqueId(), updatedPlayerMoney);
-                            MoneyManager.get().set("player." + recipient.getUniqueId(), updatedRecipientMoney);
+                            getEconomyManager().withdrawPlayer(player, Double.parseDouble(args[2]));
+                            getEconomyManager().depositPlayer(recipient, Double.parseDouble(args[2]));
 
                             for (String transactionConfirmToSenderMessages : transactionConfirmToSenderMessageList) {
                                 String translatedMessages = transactionConfirmToSenderMessages
                                         .replace("%name_of_recipient%", recipient.getName())
                                         .replace("%sent_money%", df.format(Long.parseLong(args[2])))
-                                        .replace("%sender_money_after_transaction%", df.format(updatedPlayerMoney));
+                                        .replace("%sender_money_after_transaction%", df.format(getEconomyManager().getBalance(player)));
                                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
                             }
 
@@ -159,7 +193,7 @@ public final class Uconomy extends JavaPlugin {
                                     String translatedMessages = transactionConfirmToRecipientMessages
                                             .replace("%name_of_sender%", player.getName())
                                             .replace("%received_money%", df.format(Long.parseLong(args[2])))
-                                            .replace("%recipient_money_after_transaction%", df.format(updatedRecipientMoney));
+                                            .replace("%recipient_money_after_transaction%", df.format(getEconomyManager().getBalance(recipient)));
                                     Player onlineRecipient = recipient.getPlayer();
                                     assert onlineRecipient != null;
                                     onlineRecipient.sendMessage(ChatColor.translateAlternateColorCodes('&', translatedMessages));
@@ -183,7 +217,7 @@ public final class Uconomy extends JavaPlugin {
                             }
                             OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                            if (target == null || !MoneyManager.get().getConfigurationSection("player").isSet(target.getUniqueId().toString())) {
+                            if (target == null || !getEconomyManager().hasAccount(target)) {
                                 for (String incorrectPlayerNameMessages : incorrectPlayerNameMessageList) {
                                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', incorrectPlayerNameMessages));
                                 }
@@ -196,8 +230,7 @@ public final class Uconomy extends JavaPlugin {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("지급")) {
-                                long increasedPlayerMoney = MoneyManager.get().getLong("player." + target.getUniqueId()) + Long.parseLong(args[2]);
-                                MoneyManager.get().set("player." + target.getUniqueId(), increasedPlayerMoney);
+                                getEconomyManager().depositPlayer(target, Double.parseDouble(args[2]));
 
                                 for (String increasePlayerMoneyMessages : increasePlayerMoneyMessageList) {
                                     String translatedMessages = increasePlayerMoneyMessages
@@ -208,12 +241,10 @@ public final class Uconomy extends JavaPlugin {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("차감")) {
-                                long decreasedPlayerMoney = MoneyManager.get().getLong("player." + target.getUniqueId()) - Long.parseLong(args[2]);
+                                getEconomyManager().withdrawPlayer(target, Double.parseDouble(args[2]));
 
-                                if (decreasedPlayerMoney < 0) {
-                                    MoneyManager.get().set("player." + target.getUniqueId(), 0);
-                                } else {
-                                    MoneyManager.get().set("player." + target.getUniqueId(), decreasedPlayerMoney);
+                                if (getEconomyManager().getBalance(target) < 0) {
+                                    getEconomyManager().depositPlayer(target, getEconomyManager().getBalance(target) * -1);
                                 }
 
                                 for (String decreasePlayerMoneyMessages : decreasePlayerMoneyMessageList) {
@@ -225,7 +256,8 @@ public final class Uconomy extends JavaPlugin {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("설정")) {
-                                MoneyManager.get().set("player." + target.getUniqueId(), Long.parseLong(args[2]));
+                                getEconomyManager().withdrawPlayer(target, getEconomyManager().getBalance(target));
+                                getEconomyManager().depositPlayer(target, Double.parseDouble(args[2]));
 
                                 for (String setPlayerMoneyMessages : setPlayerMoneyMessageList) {
                                     String translatedMessages = setPlayerMoneyMessages
