@@ -2,7 +2,9 @@ name: Uconomy
 version: '${project.version}'
 main: net.teamuni.economy.Uconomy
 api-version: 1.18
-depend: [Vault]
+softdepend:
+  - PlaceholderAPI
+  - Vault
 commands:
   돈:
     permission: ucon.money
