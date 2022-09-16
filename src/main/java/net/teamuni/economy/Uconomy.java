@@ -241,12 +241,10 @@ public final class Uconomy extends JavaPlugin {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("차감")) {
-                                long decreasedPlayerMoney = (long) getEconomyManager().getBalance(target) - Long.parseLong(args[2]);
+                                getEconomyManager().withdrawPlayer(target, Double.parseDouble(args[2]));
 
-                                if (decreasedPlayerMoney < 0) {
-                                    MoneyManager.get().set("player." + target.getUniqueId(), 0);
-                                } else {
-                                    getEconomyManager().withdrawPlayer(target, Double.parseDouble(args[2]));
+                                if (getEconomyManager().getBalance(target) < 0) {
+                                    getEconomyManager().depositPlayer(target, getEconomyManager().getBalance(target) * -1);
                                 }
 
                                 for (String decreasePlayerMoneyMessages : decreasePlayerMoneyMessageList) {
@@ -258,7 +256,8 @@ public final class Uconomy extends JavaPlugin {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("설정")) {
-                                MoneyManager.get().set("player." + target.getUniqueId(), Long.parseLong(args[2]));
+                                getEconomyManager().withdrawPlayer(target, getEconomyManager().getBalance(target));
+                                getEconomyManager().depositPlayer(target, Double.parseDouble(args[2]));
 
                                 for (String setPlayerMoneyMessages : setPlayerMoneyMessageList) {
                                     String translatedMessages = setPlayerMoneyMessages

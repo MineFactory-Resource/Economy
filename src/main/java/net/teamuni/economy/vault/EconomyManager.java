@@ -25,8 +25,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasBankSupport() {
-        File file = new File(Bukkit.getPluginManager().getPlugin("Uconomy").getDataFolder(), "moneydata.yml");
-        return file.exists();
+        return false;
     }
 
     @Override
