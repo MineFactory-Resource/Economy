@@ -1,8 +1,10 @@
 package net.teamuni.economy;
 
 import lombok.Getter;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.economy.Economy;
 import net.teamuni.economy.config.MessageManager;
+import net.teamuni.economy.config.UconomyPlaceholders;
 import net.teamuni.economy.data.MoneyManager;
 import net.teamuni.economy.event.JoinEvent;
 import net.teamuni.economy.vault.EconomyManager;
@@ -66,6 +68,11 @@ public final class Uconomy extends JavaPlugin {
         manager = new EconomyManager();
         hookIntoVault = new HookIntoVault();
         hookIntoVault.hook();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new UconomyPlaceholders().register();
+            getLogger().info("UconomyPlaceholders is registered successfully!");
+        }
 
         if (!setupEconomy()) {
             getLogger().info("Disabled due to no Vault dependency found!");
