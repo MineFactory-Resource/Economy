@@ -1,7 +1,6 @@
 package net.teamuni.economy;
 
 import lombok.Getter;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.economy.Economy;
 import net.teamuni.economy.config.MessageManager;
 import net.teamuni.economy.config.UconomyPlaceholders;
@@ -18,8 +17,9 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public final class Uconomy extends JavaPlugin {
@@ -27,6 +27,9 @@ public final class Uconomy extends JavaPlugin {
     private static Uconomy instance;
     private static EconomyManager manager;
     private static HookIntoVault hookIntoVault;
+    private final Map<String, Long> amount = new HashMap<>();
+    private final Map<String, String> recipientName = new HashMap<>();
+    private final Map<String, String> senderName = new HashMap<>();
 
     public static Uconomy getInstance() {
         return instance;
@@ -34,6 +37,18 @@ public final class Uconomy extends JavaPlugin {
 
     public static EconomyManager getEconomyManager() {
         return manager;
+    }
+
+    public Map<String, Long> getAmount() {
+        return amount;
+    }
+
+    public Map<String, String> getReicipientName() {
+        return recipientName;
+    }
+
+    public Map<String, String> getSenderName() {
+        return senderName;
     }
 
     List<String> reloadMessageList;
@@ -52,8 +67,6 @@ public final class Uconomy extends JavaPlugin {
     List<String> increasePlayerMoneyMessageList;
     List<String> decreasePlayerMoneyMessageList;
     List<String> setPlayerMoneyMessageList;
-
-    DecimalFormat df = new DecimalFormat("###,###");
 
     @Override
     public void onEnable() {
@@ -105,102 +118,104 @@ public final class Uconomy extends JavaPlugin {
                         case "확인":
                             switch (args.length) {
                                 case 1:
-                                    MessageManager.sendTranslatedMsgs(player, checkMyMoneyMessageList
-                                            , "%name_of_player%", player.getName()
-                                            , "%player_money%", df.format(getEconomyManager().getBalance(player)));
+                                    MessageManager.sendTranslatedMsgs(player, player, checkMyMoneyMessageList);
                                     break;
                                 case 2:
                                     if (!player.hasPermission("ucon.manage")) {
-                                        MessageManager.sendTranslatedMsgs(player, notAvailableCommandMessageList);
+                                        MessageManager.sendTranslatedMsgs(player, player, notAvailableCommandMessageList);
                                         return false;
                                     }
                                     OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
 
                                     if (target == null || !getEconomyManager().hasAccount(target)) {
-                                        MessageManager.sendTranslatedMsgs(player, incorrectPlayerNameMessageList);
+                                        MessageManager.sendTranslatedMsgs(player, player, incorrectPlayerNameMessageList);
                                         return false;
                                     }
-                                    MessageManager.sendTranslatedMsgs(player, checkTheOtherPlayerMoneyMessageList
-                                            , "%name_of_player%", target.getName()
-                                            , "%player_money%", df.format(getEconomyManager().getBalance(target)));
+                                    recipientName.clear();
+                                    recipientName.put("recipient", target.getName());
+                                    MessageManager.sendTranslatedMsgs(player, target, checkTheOtherPlayerMoneyMessageList);
                                     break;
                                 default:
-                                    MessageManager.sendTranslatedMsgs(player, notAvailableCommandMessageList);
+                                    MessageManager.sendTranslatedMsgs(player, player, notAvailableCommandMessageList);
                                     break;
                             }
                             break;
                         case "보내기":
                             if (args.length != 3) {
-                                MessageManager.sendTranslatedMsgs(player, notAvailableCommandMessageList);
+                                MessageManager.sendTranslatedMsgs(player, player, notAvailableCommandMessageList);
                                 return false;
                             }
                             OfflinePlayer recipient = Bukkit.getOfflinePlayerIfCached(args[1]);
 
                             if (recipient == null || !getEconomyManager().hasAccount(recipient)) {
-                                MessageManager.sendTranslatedMsgs(player, incorrectPlayerNameMessageList);
+                                MessageManager.sendTranslatedMsgs(player, player, incorrectPlayerNameMessageList);
                                 return false;
                             }
                             if (recipient == player) {
-                                MessageManager.sendTranslatedMsgs(player, attemptToDepositToOneselfMessageList);
+                                MessageManager.sendTranslatedMsgs(player, player, attemptToDepositToOneselfMessageList);
                                 return false;
                             }
                             if (!args[2].matches("[0-9]+")) {
-                                MessageManager.sendTranslatedMsgs(player, invalidSyntaxMessageList);
+                                MessageManager.sendTranslatedMsgs(player, player, invalidSyntaxMessageList);
                                 return false;
                             }
                             if (!getEconomyManager().has(player, Double.parseDouble(args[2]))) {
-                                MessageManager.sendTranslatedMsgs(player, moneyShortageMessageList);
+                                MessageManager.sendTranslatedMsgs(player, player, moneyShortageMessageList);
                                 return false;
                             }
                             if (Long.parseLong(args[2]) < getConfig().getLong("minimum_amount")) {
-                                MessageManager.sendTranslatedMsgs(player, minimumAmountCautionMessageList
-                                        , "%value_of_minimum%", df.format(getConfig().getLong("minimum_amount")));
+                                MessageManager.sendTranslatedMsgs(player, player, minimumAmountCautionMessageList);
                                 return false;
                             }
                             getEconomyManager().withdrawPlayer(player, Double.parseDouble(args[2]));
                             getEconomyManager().depositPlayer(recipient, Double.parseDouble(args[2]));
 
-                            MessageManager.sendTranslatedMsgs(player, transactionConfirmToSenderMessageList
-                                    , "%name_of_recipient%", recipient.getName()
-                                    , "%sent_money%", df.format(Long.parseLong(args[2]))
-                                    , "%sender_money_after_transaction%", df.format(getEconomyManager().getBalance(player)));
+                            amount.clear();
+                            amount.put("changedValue", Long.parseLong(args[2]));
+                            senderName.clear();
+                            senderName.put("sender", player.getName());
+                            recipientName.clear();
+                            recipientName.put("recipient", recipient.getName());
+                            MessageManager.sendTranslatedMsgs(player, player, transactionConfirmToSenderMessageList);
 
                             if (recipient.isOnline()) {
                                 Player onlineRecipient = recipient.getPlayer();
                                 assert onlineRecipient != null;
-                                MessageManager.sendTranslatedMsgs(onlineRecipient, transactionConfirmToRecipientMessageList
-                                        , "%name_of_sender%", player.getName()
-                                        , "%received_money%", df.format(Long.parseLong(args[2]))
-                                        , "%recipient_money_after_transaction%", df.format(getEconomyManager().getBalance(recipient)));
+                                MessageManager.sendTranslatedMsgs(onlineRecipient, recipient, transactionConfirmToRecipientMessageList);
                             }
                             break;
                         case "지급":
                         case "차감":
                         case "설정":
                             if (!player.hasPermission("ucon.manage")) {
-                                MessageManager.sendTranslatedMsgs(player, notAvailableCommandMessageList);
+                                MessageManager.sendTranslatedMsgs(player, player, notAvailableCommandMessageList);
                                 return false;
                             }
                             if (args.length != 3) {
-                                MessageManager.sendTranslatedMsgs(player, notAvailableCommandMessageList);
+                                MessageManager.sendTranslatedMsgs(player, player, notAvailableCommandMessageList);
                                 return false;
                             }
                             OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
 
                             if (target == null || !getEconomyManager().hasAccount(target)) {
-                                MessageManager.sendTranslatedMsgs(player, incorrectPlayerNameMessageList);
+                                MessageManager.sendTranslatedMsgs(player, target, incorrectPlayerNameMessageList);
                                 return false;
                             }
                             if (!args[2].matches("[0-9]+")) {
-                                MessageManager.sendTranslatedMsgs(player, invalidSyntaxMessageList);
+                                MessageManager.sendTranslatedMsgs(player, player, invalidSyntaxMessageList);
                                 return false;
                             }
+                            amount.clear();
+                            amount.put("changedValue", Long.parseLong(args[2]));
+                            senderName.clear();
+                            senderName.put("sender", player.getName());
+                            recipientName.clear();
+                            recipientName.put("recipient", target.getName());
+
                             if (args[0].equalsIgnoreCase("지급")) {
                                 getEconomyManager().depositPlayer(target, Double.parseDouble(args[2]));
 
-                                MessageManager.sendTranslatedMsgs(player, increasePlayerMoneyMessageList
-                                        , "%name_of_player%", target.getName()
-                                        , "%increased_money%", df.format(Long.parseLong(args[2])));
+                                MessageManager.sendTranslatedMsgs(player, target, increasePlayerMoneyMessageList);
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("차감")) {
@@ -209,30 +224,26 @@ public final class Uconomy extends JavaPlugin {
                                 if (getEconomyManager().getBalance(target) < 0) {
                                     getEconomyManager().depositPlayer(target, getEconomyManager().getBalance(target) * -1);
                                 }
-                                MessageManager.sendTranslatedMsgs(player, decreasePlayerMoneyMessageList
-                                        , "%name_of_player%", target.getName()
-                                        , "%decreased_money%", df.format(Long.parseLong(args[2])));
+                                MessageManager.sendTranslatedMsgs(player, target, decreasePlayerMoneyMessageList);
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("설정")) {
                                 getEconomyManager().withdrawPlayer(target, getEconomyManager().getBalance(target));
                                 getEconomyManager().depositPlayer(target, Double.parseDouble(args[2]));
 
-                                MessageManager.sendTranslatedMsgs(player, setPlayerMoneyMessageList
-                                        , "%name_of_player%", target.getName()
-                                        , "%set_money%", df.format(Long.parseLong(args[2])));
+                                MessageManager.sendTranslatedMsgs(player, target, setPlayerMoneyMessageList);
                                 return false;
                             }
                             break;
                         default:
-                            MessageManager.sendTranslatedMsgs(player, notAvailableCommandMessageList);
+                            MessageManager.sendTranslatedMsgs(player, player, notAvailableCommandMessageList);
                             break;
                     }
                 } else {
                     if (player.hasPermission("ucon.manage")) {
-                        MessageManager.sendTranslatedMsgs(player, opCommandGuideMessageList);
+                        MessageManager.sendTranslatedMsgs(player, player, opCommandGuideMessageList);
                     } else {
-                        MessageManager.sendTranslatedMsgs(player, commandGuideMessageList);
+                        MessageManager.sendTranslatedMsgs(player, player, commandGuideMessageList);
                     }
                 }
                 return false;
@@ -242,7 +253,7 @@ public final class Uconomy extends JavaPlugin {
                 MoneyManager.save();
                 MessageManager.reload();
                 getMessages();
-                MessageManager.sendTranslatedMsgs(player, reloadMessageList);
+                MessageManager.sendTranslatedMsgs(player, player, reloadMessageList);
             }
             return false;
         }
