@@ -1,4 +1,4 @@
-package net.teamuni.economy.config;
+package net.teamuni.economy.hooks;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.teamuni.economy.Uconomy;

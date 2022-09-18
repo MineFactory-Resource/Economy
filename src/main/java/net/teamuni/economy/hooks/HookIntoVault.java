@@ -1,7 +1,8 @@
-package net.teamuni.economy.vault;
+package net.teamuni.economy.hooks;
 
 import net.milkbowl.vault.economy.Economy;
 import net.teamuni.economy.Uconomy;
+import net.teamuni.economy.data.EconomyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 

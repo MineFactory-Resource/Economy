@@ -1,4 +1,4 @@
-package net.teamuni.economy.vault;
+package net.teamuni.economy.data;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
