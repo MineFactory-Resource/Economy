@@ -36,6 +36,18 @@
 ### 플러그인 리로드 기능
 /uconomy reload 명령어를 사용하여 플러그인을 리로드할 수 있습니다.
 
+### Uconomy Placeholders
+- %Uconomy_balance%
+  - 해당하는 플레이어의 돈 정보를 불러옵니다.
+- %Uconomy_minimum_value% 
+  - config.yml의 minimum_amount에 할당된 값을 불러옵니다.
+- %Uconomy_transfered_money%
+  - /돈 보내기, 지급, 차감, 설정 명령어를 입력하였을 때 플레이어 간의 오고 간 돈의 양을 불러옵니다.
+- %Uconomy_sender_name%
+  - 돈을 보낸 플레이어의 닉네임을 불러옵니다.
+- %Uconomy_recipient_name%
+  - 돈을 받은 플레이어의 닉네임을 불러옵니다.
+
 ## Commands
 ```yaml
 commands:
