@@ -17,9 +17,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 public final class Uconomy extends JavaPlugin {
@@ -27,9 +25,6 @@ public final class Uconomy extends JavaPlugin {
     private static Uconomy instance;
     private static EconomyManager manager;
     private static HookIntoVault hookIntoVault;
-    private final Map<String, Long> amount = new HashMap<>();
-    private final Map<String, String> recipientName = new HashMap<>();
-    private final Map<String, String> senderName = new HashMap<>();
 
     public static Uconomy getInstance() {
         return instance;
@@ -37,18 +32,6 @@ public final class Uconomy extends JavaPlugin {
 
     public static EconomyManager getEconomyManager() {
         return manager;
-    }
-
-    public Map<String, Long> getAmount() {
-        return amount;
-    }
-
-    public Map<String, String> getReicipientName() {
-        return recipientName;
-    }
-
-    public Map<String, String> getSenderName() {
-        return senderName;
     }
 
     List<String> reloadMessageList;
@@ -131,8 +114,6 @@ public final class Uconomy extends JavaPlugin {
                                         MessageManager.sendTranslatedMsgs(player, player, incorrectPlayerNameMessageList);
                                         return false;
                                     }
-                                    recipientName.clear();
-                                    recipientName.put("recipient", target.getName());
                                     MessageManager.sendTranslatedMsgs(player, target, checkTheOtherPlayerMoneyMessageList);
                                     break;
                                 default:
@@ -170,12 +151,6 @@ public final class Uconomy extends JavaPlugin {
                             getEconomyManager().withdrawPlayer(player, Double.parseDouble(args[2]));
                             getEconomyManager().depositPlayer(recipient, Double.parseDouble(args[2]));
 
-                            amount.clear();
-                            amount.put("changedValue", Long.parseLong(args[2]));
-                            senderName.clear();
-                            senderName.put("sender", player.getName());
-                            recipientName.clear();
-                            recipientName.put("recipient", recipient.getName());
                             MessageManager.sendTranslatedMsgs(player, player, transactionConfirmToSenderMessageList);
 
                             if (recipient.isOnline()) {
@@ -205,12 +180,6 @@ public final class Uconomy extends JavaPlugin {
                                 MessageManager.sendTranslatedMsgs(player, player, invalidSyntaxMessageList);
                                 return false;
                             }
-                            amount.clear();
-                            amount.put("changedValue", Long.parseLong(args[2]));
-                            senderName.clear();
-                            senderName.put("sender", player.getName());
-                            recipientName.clear();
-                            recipientName.put("recipient", target.getName());
 
                             if (args[0].equalsIgnoreCase("지급")) {
                                 getEconomyManager().depositPlayer(target, Double.parseDouble(args[2]));

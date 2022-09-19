@@ -43,23 +43,6 @@ public class UconomyPlaceholders extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("minimum_value")) {
             return df.format(main.getConfig().getLong("minimum_amount"));
         }
-        if (params.equalsIgnoreCase("transfered_money")) {
-            return df.format(main.getAmount().get("changedValue"));
-        }
-        if (params.equalsIgnoreCase("sender_name")) {
-            if (main.getSenderName().get("sender").isEmpty()) {
-                return null;
-            } else {
-                return main.getSenderName().get("sender");
-            }
-        }
-        if (params.equalsIgnoreCase("recipient_name")) {
-            if (main.getReicipientName().get("recipient").isEmpty()) {
-                return null;
-            } else {
-                return main.getReicipientName().get("recipient");
-            }
-        }
         return null;
     }
 }
