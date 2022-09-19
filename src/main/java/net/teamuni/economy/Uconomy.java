@@ -7,6 +7,7 @@ import net.teamuni.economy.data.MoneyManager;
 import net.teamuni.economy.event.JoinEvent;
 import net.teamuni.economy.hooks.HookIntoVault;
 import net.teamuni.economy.data.EconomyManager;
+import net.teamuni.economy.hooks.UconomyPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -66,6 +67,10 @@ public final class Uconomy extends JavaPlugin {
         manager = new EconomyManager();
         hookIntoVault = new HookIntoVault();
         hookIntoVault.hook();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new UconomyPlaceholders().register();
+        }
 
         if (!setupEconomy()) {
             getLogger().info("Disabled due to no Vault dependency found!");

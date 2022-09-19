@@ -22,7 +22,7 @@ public class UconomyPlaceholders extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "Uconomy";
+        return "uconomy";
     }
 
     @Override
