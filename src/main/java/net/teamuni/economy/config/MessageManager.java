@@ -4,7 +4,6 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.teamuni.economy.Uconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -43,19 +42,72 @@ public class MessageManager {
         commandsFile = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static void sendTranslatedMsgs(Player player, OfflinePlayer recipient, List<String> msgList) {
+    public static void sendTranslatedMsgs(Player player, List<String> msgList) {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            try {
-                List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(recipient, msgList);
-                for (String msgs : translatedMsgs) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', msgs));
-                }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
+            List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(player, msgList);
+            for (String msgs : translatedMsgs) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', msgs));
             }
         } else {
             for (String msgs : msgList) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', msgs));
+            }
+        }
+    }
+
+    public static void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg) {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(player, msgList);
+            for (String msgs : translatedMsgs) {
+                String customMsgs = msgs
+                        .replace(msg, transMsg);
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', customMsgs));
+            }
+        } else {
+            for (String msgs : msgList) {
+                String customMsgs = msgs
+                        .replace(msg, transMsg);
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', customMsgs));
+            }
+        }
+    }
+
+    public static void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg, String msg2, String transMsg2) {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(player, msgList);
+            for (String msgs : translatedMsgs) {
+                String customMsgs = msgs
+                        .replace(msg, transMsg)
+                        .replace(msg2, transMsg2);
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', customMsgs));
+            }
+        } else {
+            for (String msgs : msgList) {
+                String customMsgs = msgs
+                        .replace(msg, transMsg)
+                        .replace(msg2, transMsg2);
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', customMsgs));
+            }
+        }
+    }
+
+    public static void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg, String msg2, String transMsg2, String msg3, String transMsg3) {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(player, msgList);
+            for (String msgs : translatedMsgs) {
+                String customMsgs = msgs
+                        .replace(msg, transMsg)
+                        .replace(msg2, transMsg2)
+                        .replace(msg3, transMsg3);
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', customMsgs));
+            }
+        } else {
+            for (String msgs : msgList) {
+                String customMsgs = msgs
+                        .replace(msg, transMsg)
+                        .replace(msg2, transMsg2)
+                        .replace(msg3, transMsg3);
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', customMsgs));
             }
         }
     }
