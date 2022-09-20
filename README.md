@@ -37,9 +37,9 @@
 /uconomy reload 명령어를 사용하여 플러그인을 리로드할 수 있습니다.
 
 ### Uconomy Placeholders
-- %Uconomy_balance%
+- %uconomy_balance%
   - 해당하는 플레이어의 돈 정보를 불러옵니다.
-- %Uconomy_minimum_value% 
+- %uconomy_minimum_value% 
   - config.yml의 minimum_amount에 할당된 값을 불러옵니다.
 
 ## Commands
