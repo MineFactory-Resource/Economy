@@ -2,7 +2,6 @@ package net.teamuni.economy.hooks;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.teamuni.economy.Uconomy;
-import net.teamuni.economy.data.MoneyManager;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
