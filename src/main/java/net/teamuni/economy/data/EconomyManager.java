@@ -2,16 +2,19 @@ package net.teamuni.economy.data;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
-import net.teamuni.economy.data.MoneyManager;
+import net.teamuni.economy.Uconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.*;
 
 public class EconomyManager implements Economy {
+    private final Uconomy main;
+    public EconomyManager(Uconomy instance) {
+        this.main = instance;
+    }
 
     @Override
     public boolean isEnabled() {
@@ -69,7 +72,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player) {
-        return MoneyManager.get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
+        return main.getMoneyManager().get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
     }
 
     @Deprecated
@@ -79,7 +82,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player, String worldName) {
-        return MoneyManager.get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
+        return main.getMoneyManager().get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
     }
 
     @Deprecated
@@ -87,13 +90,13 @@ public class EconomyManager implements Economy {
         Player player = Bukkit.getPlayer(playerName);
         assert player != null;
         String playerUuid = player.getUniqueId().toString();
-        return MoneyManager.get().getLong("player." + playerUuid);
+        return main.getMoneyManager().get().getLong("player." + playerUuid);
     }
 
     @Override
     public double getBalance(OfflinePlayer player) {
         String playerUuid = player.getUniqueId().toString();
-        return MoneyManager.get().getLong("player." + playerUuid);
+        return main.getMoneyManager().get().getLong("player." + playerUuid);
     }
 
     @Deprecated
@@ -101,13 +104,13 @@ public class EconomyManager implements Economy {
         Player player = Bukkit.getPlayer(playerName);
         assert player != null;
         String playerUuid = player.getUniqueId().toString();
-        return MoneyManager.get().getLong("player." + playerUuid);
+        return main.getMoneyManager().get().getLong("player." + playerUuid);
     }
 
     @Override
     public double getBalance(OfflinePlayer player, String world) {
         String playerUuid = player.getUniqueId().toString();
-        return MoneyManager.get().getLong("player." + playerUuid);
+        return main.getMoneyManager().get().getLong("player." + playerUuid);
     }
 
     @Deprecated
@@ -141,7 +144,7 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double withdrawedMoney = getBalance(player) - amount;
-        MoneyManager.get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
+        main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
 
         return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
@@ -157,7 +160,7 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double withdrawedMoney = getBalance(player) - amount;
-        MoneyManager.get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
+        main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
 
         return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
@@ -173,7 +176,7 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double depositedMoney = getBalance(player) + amount;
-        MoneyManager.get().set("player." + player.getUniqueId(), (long) depositedMoney);
+        main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
 
         return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
@@ -189,7 +192,7 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double depositedMoney = getBalance(player) + amount;
-        MoneyManager.get().set("player." + player.getUniqueId(), (long) depositedMoney);
+        main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
 
         return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
@@ -261,7 +264,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
-        MoneyManager.get().set("player." + player.getUniqueId(), 0);
+        main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
         return false;
     }
 
@@ -272,7 +275,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player, String worldName) {
-        MoneyManager.get().set("player." + player.getUniqueId(), 0);
+        main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
         return false;
     }
 }

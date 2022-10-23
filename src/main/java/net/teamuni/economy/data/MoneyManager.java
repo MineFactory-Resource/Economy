@@ -8,11 +8,13 @@ import java.io.File;
 import java.io.IOException;
 
 public class MoneyManager {
-    private static final Uconomy main = Uconomy.getPlugin(Uconomy.class);
-    private static File file;
-    private static FileConfiguration commandsFile;
-
-    public static void createMoneyDataYml() {
+    private final Uconomy main;
+    private File file = null;
+    private FileConfiguration commandsFile = null;
+    public MoneyManager(Uconomy instance) {
+        this.main = instance;
+    }
+    public void createMoneyDataYml() {
         file = new File(main.getDataFolder(), "moneydata.yml");
 
         if (!file.exists()) {
@@ -21,11 +23,11 @@ public class MoneyManager {
         commandsFile = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static FileConfiguration get() {
+    public FileConfiguration get() {
         return commandsFile;
     }
 
-    public static void save() {
+    public void save() {
         try {
             commandsFile.save(file);
         } catch (IOException e) {
@@ -33,7 +35,7 @@ public class MoneyManager {
         }
     }
 
-    public static void reload() {
+    public void reload() {
         commandsFile = YamlConfiguration.loadConfiguration(file);
     }
 }

@@ -6,17 +6,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 
 public class HookIntoVault {
-    private final Uconomy plugin = Uconomy.getInstance();
     private Economy provider;
+    private final Uconomy main;
+    public HookIntoVault(Uconomy instance) {
+        this.main = instance;
+    }
 
     public void hook() {
-        provider = Uconomy.getEconomyManager();
-        Bukkit.getServicesManager().register(Economy.class, provider, this.plugin, ServicePriority.High);
-        Bukkit.getLogger().info("[Uconomy] Vault is hooked into " + plugin.getName() + " sucessfully!");
+        this.provider = main.getEconomyManager();
+        Bukkit.getServicesManager().register(Economy.class, this.provider, this.main, ServicePriority.High);
+        Bukkit.getLogger().info("[Uconomy] Vault is hooked into " + this.main.getName() + " sucessfully!");
     }
 
     public void unhook() {
         Bukkit.getServicesManager().unregister(Economy.class, this.provider);
-        Bukkit.getLogger().info("[Uconomy] Vault is unhooked from " + plugin.getName() + " sucessfully!");
+        Bukkit.getLogger().info("[Uconomy] Vault is unhooked from " + this.main.getName() + " sucessfully!");
     }
 }
