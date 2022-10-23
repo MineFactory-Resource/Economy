@@ -1,4 +1,4 @@
-package net.teamuni.economy;
+package net.teamuni.economy.command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -18,59 +18,59 @@ public class CommandTabCompleter implements TabCompleter {
         Player player = (Player) sender;
 
         if (command.getName().equalsIgnoreCase("돈")) {
-            List<String> tabComleteMessage = new ArrayList<>();
+            List<String> tabCompleteMessage = new ArrayList<>();
 
             if (args.length == 1) {
                 if (player.hasPermission("ucon.manage")) {
-                    tabComleteMessage.add("확인");
-                    tabComleteMessage.add("보내기");
-                    tabComleteMessage.add("지급");
-                    tabComleteMessage.add("차감");
-                    tabComleteMessage.add("설정");
+                    tabCompleteMessage.add("확인");
+                    tabCompleteMessage.add("보내기");
+                    tabCompleteMessage.add("지급");
+                    tabCompleteMessage.add("차감");
+                    tabCompleteMessage.add("설정");
                 } else {
-                    tabComleteMessage.add("확인");
-                    tabComleteMessage.add("보내기");
+                    tabCompleteMessage.add("확인");
+                    tabCompleteMessage.add("보내기");
                 }
-                return tabComleteMessage;
+                return tabCompleteMessage;
 
             } else if (args[0].equalsIgnoreCase("확인") && player.hasPermission("ucon.manage")) {
                 if (args.length == 2) {
                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                        tabComleteMessage.add(onlinePlayers.getName());
+                        tabCompleteMessage.add(onlinePlayers.getName());
                     }
                 }
-                return tabComleteMessage;
+                return tabCompleteMessage;
 
             } else if (args[0].equalsIgnoreCase("보내기")) {
                 if (args.length == 2) {
                     for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                        tabComleteMessage.add(onlinePlayers.getName());
+                        tabCompleteMessage.add(onlinePlayers.getName());
                     }
                 } else if (args.length == 3) {
-                    tabComleteMessage.add("금액");
+                    tabCompleteMessage.add("금액");
                 }
-                return tabComleteMessage;
+                return tabCompleteMessage;
 
             } else if (args[0].equalsIgnoreCase("지급") || args[0].equalsIgnoreCase("차감") || args[0].equalsIgnoreCase("설정")) {
                 if (player.hasPermission("ucon.manage")) {
                     if (args.length == 2) {
                         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                            tabComleteMessage.add(onlinePlayers.getName());
+                            tabCompleteMessage.add(onlinePlayers.getName());
                         }
                     } else if (args.length == 3) {
-                        tabComleteMessage.add("금액");
+                        tabCompleteMessage.add("금액");
                     }
                 }
-                return tabComleteMessage;
+                return tabCompleteMessage;
             }
 
         } else if (command.getName().equalsIgnoreCase("uconomy")) {
-            List<String> tabComleteMessage = new ArrayList<>();
+            List<String> tabCompleteMessage = new ArrayList<>();
 
             if (args.length == 1) {
-                tabComleteMessage.add("reload");
+                tabCompleteMessage.add("reload");
             }
-            return tabComleteMessage;
+            return tabCompleteMessage;
         }
         return null;
     }
