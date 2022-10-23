@@ -10,7 +10,7 @@ import java.io.IOException;
 public class MoneyManager {
     private final Uconomy main;
     private File file = null;
-    private FileConfiguration commandsFile = null;
+    private FileConfiguration moneyDataFile = null;
     public MoneyManager(Uconomy instance) {
         this.main = instance;
     }
@@ -20,22 +20,26 @@ public class MoneyManager {
         if (!file.exists()) {
             main.saveResource("moneydata.yml", false);
         }
-        commandsFile = YamlConfiguration.loadConfiguration(file);
+        moneyDataFile = YamlConfiguration.loadConfiguration(file);
     }
 
     public FileConfiguration get() {
-        return commandsFile;
+        return moneyDataFile;
     }
 
     public void save() {
+        if (this.file == null || this.moneyDataFile == null) return;
         try {
-            commandsFile.save(file);
+            moneyDataFile.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void reload() {
-        commandsFile = YamlConfiguration.loadConfiguration(file);
+        if (this.file == null) {
+            this.file = new File(main.getDataFolder(), "moneydata.yml");
+        }
+        moneyDataFile = YamlConfiguration.loadConfiguration(file);
     }
 }
