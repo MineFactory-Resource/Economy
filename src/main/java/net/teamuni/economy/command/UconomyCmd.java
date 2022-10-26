@@ -27,15 +27,15 @@ public class UconomyCmd implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player player) {
-
             if (command.getName().equalsIgnoreCase("돈")) {
                 if (args.length > 0) {
                     switch (args[0]) {
                         case "확인":
                             switch (args.length) {
-                                case 1 -> main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("check_my_money")
-                                        , "%name_of_player%", player.getName()
-                                        , "%player_money%", df.format(main.getEconomyManager().getBalance(player)));
+                                case 1 ->
+                                        main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("check_my_money")
+                                                , "%name_of_player%", player.getName()
+                                                , "%player_money%", df.format(main.getEconomyManager().getBalance(player)));
                                 case 2 -> {
                                     if (!player.hasPermission("ucon.manage")) {
                                         main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("not_available_command"));
@@ -50,7 +50,8 @@ public class UconomyCmd implements CommandExecutor {
                                             , "%name_of_player%", target.getName()
                                             , "%player_money%", df.format(main.getEconomyManager().getBalance(target)));
                                 }
-                                default -> main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("not_available_command"));
+                                default ->
+                                        main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("not_available_command"));
                             }
                             break;
                         case "보내기":
@@ -98,9 +99,7 @@ public class UconomyCmd implements CommandExecutor {
                                         , "%recipient_money_after_transaction%", df.format(main.getEconomyManager().getBalance(recipient)));
                             }
                             break;
-                        case "지급":
-                        case "차감":
-                        case "설정":
+                        case "지급", "차감", "설정":
                             if (!player.hasPermission("ucon.manage")) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("not_available_command"));
                                 return false;

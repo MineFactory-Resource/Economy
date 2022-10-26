@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -72,7 +73,15 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player) {
-        return main.getMoneyManager().get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
+        if (main.isMySQLUse()) {
+            try {
+                return main.getDatabase().findPlayerStatsByUUID(player.getUniqueId().toString()) != null;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return main.getMoneyManager().get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
+        }
     }
 
     @Deprecated
@@ -82,7 +91,15 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player, String worldName) {
-        return main.getMoneyManager().get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
+        if (main.isMySQLUse()) {
+            try {
+                return main.getDatabase().findPlayerStatsByUUID(player.getUniqueId().toString()) != null;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return main.getMoneyManager().get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
+        }
     }
 
     @Deprecated
@@ -96,7 +113,15 @@ public class EconomyManager implements Economy {
     @Override
     public double getBalance(OfflinePlayer player) {
         String playerUuid = player.getUniqueId().toString();
-        return main.getMoneyManager().get().getLong("player." + playerUuid);
+        if (main.isMySQLUse()) {
+            try {
+                return main.getDatabase().getPlayerMoney(playerUuid);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return main.getMoneyManager().get().getLong("player." + playerUuid);
+        }
     }
 
     @Deprecated
@@ -110,7 +135,15 @@ public class EconomyManager implements Economy {
     @Override
     public double getBalance(OfflinePlayer player, String world) {
         String playerUuid = player.getUniqueId().toString();
-        return main.getMoneyManager().get().getLong("player." + playerUuid);
+        if (main.isMySQLUse()) {
+            try {
+                return main.getDatabase().getPlayerMoney(playerUuid);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return main.getMoneyManager().get().getLong("player." + playerUuid);
+        }
     }
 
     @Deprecated
@@ -144,8 +177,15 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double withdrawedMoney = getBalance(player) - amount;
-        main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
-
+        if (main.isMySQLUse()) {
+            try {
+                main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) withdrawedMoney));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
+        }
         return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
@@ -160,8 +200,15 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double withdrawedMoney = getBalance(player) - amount;
-        main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
-
+        if (main.isMySQLUse()) {
+            try {
+                main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) withdrawedMoney));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
+        }
         return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
@@ -176,8 +223,17 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double depositedMoney = getBalance(player) + amount;
-        main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
-
+        if (main.isMySQLUse()) {
+            Bukkit.getLogger().info("isMySQLUse = true");
+            try {
+                main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) depositedMoney));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            Bukkit.getLogger().info("isMySQLUse = false");
+            main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
+        }
         return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
@@ -192,8 +248,15 @@ public class EconomyManager implements Economy {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
         double depositedMoney = getBalance(player) + amount;
-        main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
-
+        if (main.isMySQLUse()) {
+            try {
+                main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) depositedMoney));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
+        }
         return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
@@ -264,8 +327,16 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
-        main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
-        return false;
+        if (main.isMySQLUse()) {
+            try {
+                main.getDatabase().createPlayerStats(new PlayerData(player.getUniqueId().toString(), 0));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
+        }
+        return true;
     }
 
     @Deprecated
@@ -275,7 +346,15 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player, String worldName) {
-        main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
-        return false;
+        if (main.isMySQLUse()) {
+            try {
+                main.getDatabase().createPlayerStats(new PlayerData(player.getUniqueId().toString(), 0));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
+        }
+        return true;
     }
 }
