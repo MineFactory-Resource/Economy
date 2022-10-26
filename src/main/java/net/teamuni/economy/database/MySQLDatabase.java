@@ -52,8 +52,6 @@ public class MySQLDatabase {
             if (resultSet.next()) {
                 return new PlayerData(uuid, resultSet.getLong(2));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return null;
     }
@@ -68,8 +66,6 @@ public class MySQLDatabase {
             if (resultSet.next()) {
                 return resultSet.getLong(2);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return 0;
     }
@@ -82,8 +78,6 @@ public class MySQLDatabase {
 
         try (connection; statement) {
             statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -95,8 +89,6 @@ public class MySQLDatabase {
 
         try (connection; statement) {
             statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 }
