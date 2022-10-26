@@ -6,6 +6,7 @@ import net.teamuni.economy.command.CommandTabCompleter;
 import net.teamuni.economy.command.UconomyCmd;
 import net.teamuni.economy.config.MessageManager;
 import net.teamuni.economy.data.MoneyManager;
+import net.teamuni.economy.database.MySQLDatabase;
 import net.teamuni.economy.event.JoinEvent;
 import net.teamuni.economy.hooks.HookIntoVault;
 import net.teamuni.economy.data.EconomyManager;
@@ -14,12 +15,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Level;
+
 @Getter
 public final class Uconomy extends JavaPlugin {
     private HookIntoVault hookIntoVault;
     private EconomyManager economyManager;
     private MessageManager messageManager;
     private MoneyManager moneyManager;
+    private MySQLDatabase database;
+    private boolean isMySQLUse = false;
 
     @Override
     public void onEnable() {
@@ -31,6 +36,18 @@ public final class Uconomy extends JavaPlugin {
         this.messageManager.createMessagesYml();
         this.moneyManager.createMoneyDataYml();
         saveDefaultConfig();
+        this.isMySQLUse = Boolean.parseBoolean(getConfig().getString("mysql_use"));
+        if (isMySQLUse) {
+            try {
+                this.database = new MySQLDatabase(
+                        getConfig().getString("MySQL.Host"), getConfig().getInt("MySQL.Port"),
+                        getConfig().getString("MySQL.Database"), getConfig().getString("MySQL.Parameters"),
+                        getConfig().getString("MySQL.Username"), getConfig().getString("MySQL.Password"));
+            } catch (Exception e) {
+                getLogger().log(Level.SEVERE, "데이터베이스 연결에 실패하였습니다.", e);
+                this.database = null;
+            }
+        }
         Bukkit.getPluginManager().registerEvents(new JoinEvent(this), this);
         getCommand("돈").setExecutor(new UconomyCmd(this));
         getCommand("uconomy").setExecutor(new UconomyCmd(this));
