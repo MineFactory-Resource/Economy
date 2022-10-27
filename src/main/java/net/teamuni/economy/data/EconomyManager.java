@@ -224,14 +224,12 @@ public class EconomyManager implements Economy {
         }
         double depositedMoney = getBalance(player) + amount;
         if (main.isMySQLUse()) {
-            Bukkit.getLogger().info("isMySQLUse = true");
             try {
                 main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) depositedMoney));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         } else {
-            Bukkit.getLogger().info("isMySQLUse = false");
             main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
         }
         return new EconomyResponse(amount, depositedMoney, EconomyResponse.ResponseType.SUCCESS, "");
