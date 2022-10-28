@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 public class MySQLDatabase {
     private final HikariDataSource sql;
@@ -17,7 +18,7 @@ public class MySQLDatabase {
         HikariConfig config = new HikariConfig();
         config.setUsername(user);
         config.setPassword(password);
-        var sb = new StringBuilder("jdbc:mysql://")
+        StringBuilder sb = new StringBuilder("jdbc:mysql://")
                 .append(host).append(":").append(port).append("/").append(database);
         if (!parameters.isEmpty()) {
             sb.append(parameters);
@@ -42,53 +43,36 @@ public class MySQLDatabase {
         }
     }
 
-    public PlayerData findPlayerStatsByUUID(String uuid) throws SQLException {
-        Connection connection = this.sql.getConnection();
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM uc_stats WHERE uuid = ?");
-        statement.setString(1, uuid);
-        ResultSet resultSet = statement.executeQuery();
+    public void updatePlayerStats(PlayerData stats) {
+        try {
+            Connection connection = this.sql.getConnection();
+            PreparedStatement statement = connection.prepareStatement("UPDATE uc_stats SET money = ? WHERE uuid = ?");
+            statement.setLong(1, stats.getMoney());
+            statement.setString(2, stats.getUuid());
 
-        try (connection; statement; resultSet) {
-            if (resultSet.next()) {
-                return new PlayerData(uuid, resultSet.getLong(2));
+            try (connection; statement) {
+                statement.executeUpdate();
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return null;
     }
 
-    public long getPlayerMoney(String uuid) throws SQLException {
-        Connection connection = this.sql.getConnection();
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM uc_stats WHERE uuid = ?");
-        statement.setString(1, uuid);
-        ResultSet resultSet = statement.executeQuery();
+    public PlayerData loadPlayerStats(UUID uuid) {
+        try {
+            Connection connection = this.sql.getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT money FROM uc_stats WHERE uuid = ?");
+            statement.setString(1, uuid.toString());
 
-        try (connection; statement; resultSet) {
-            if (resultSet.next()) {
-                return resultSet.getLong(2);
+            try (connection; statement) {
+                ResultSet result = statement.executeQuery();
+                if (result.next()) {
+                    return new PlayerData(uuid.toString(), result.getInt(1));
+                }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return 0;
-    }
-
-    public void createPlayerStats(PlayerData stats) throws SQLException {
-        Connection connection = this.sql.getConnection();
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO uc_stats(uuid, money) VALUES (?, ?)");
-        statement.setString(1, stats.uuid());
-        statement.setLong(2, stats.money());
-
-        try (connection; statement) {
-            statement.executeUpdate();
-        }
-    }
-
-    public void updatePlayerStats(PlayerData stats) throws SQLException {
-        Connection connection = this.sql.getConnection();
-        PreparedStatement statement = connection.prepareStatement("UPDATE uc_stats SET money = ? WHERE uuid = ?");
-        statement.setLong(1, stats.money());
-        statement.setString(2, stats.uuid());
-
-        try (connection; statement) {
-            statement.executeUpdate();
-        }
+        return new PlayerData(uuid.toString(), 0);
     }
 }
