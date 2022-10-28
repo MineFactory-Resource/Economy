@@ -46,9 +46,10 @@ public class MySQLDatabase {
     public void updatePlayerStats(PlayerData stats) {
         try {
             Connection connection = this.sql.getConnection();
-            PreparedStatement statement = connection.prepareStatement("UPDATE uc_stats SET money = ? WHERE uuid = ?");
-            statement.setLong(1, stats.getMoney());
-            statement.setString(2, stats.getUuid());
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO uc_stats (uuid, money) VALUE (?, ?) ON DUPLICATE KEY UPDATE money = ?");
+            statement.setString(1, stats.getUuid());
+            statement.setLong(2, stats.getMoney());
+            statement.setLong(3, stats.getMoney());
 
             try (connection; statement) {
                 statement.executeUpdate();
