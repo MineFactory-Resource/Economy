@@ -2,6 +2,7 @@ package net.teamuni.economy.hooks;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.teamuni.economy.Uconomy;
+import net.teamuni.economy.data.PlayerData;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,11 @@ public class UconomyPlaceholders extends PlaceholderExpansion {
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         if (params.equalsIgnoreCase("balance")) {
+            if (main.isMySQLUse()) {
+                PlayerData cacheIfPresent = main.getPlayerDataManager().getCacheIfPresent(player.getUniqueId());
+                PlayerData cacheUnchecked = main.getPlayerDataManager().getCache(player.getUniqueId());
+                return cacheIfPresent == null ? df.format(cacheUnchecked.getMoney()) : df.format(cacheIfPresent.getMoney());
+            }
             return df.format(main.getMoneyManager().get().getLong("player." + player.getUniqueId()));
         }
         if (params.equalsIgnoreCase("minimum_value")) {
