@@ -5,9 +5,9 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import net.teamuni.economy.Uconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -73,15 +73,12 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player) {
-        if (main.isMySQLUse()) {
-            try {
-                return main.getDatabase().findPlayerStatsByUUID(player.getUniqueId().toString()) != null;
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return main.getMoneyManager().get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
+        if (!main.isMySQLUse()) {
+            ConfigurationSection section = main.getMoneyManager().get().getConfigurationSection("player");
+            if (section == null) return false;
+            return section.isSet(player.getUniqueId().toString());
         }
+        return true;
     }
 
     @Deprecated
@@ -91,15 +88,12 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean hasAccount(OfflinePlayer player, String worldName) {
-        if (main.isMySQLUse()) {
-            try {
-                return main.getDatabase().findPlayerStatsByUUID(player.getUniqueId().toString()) != null;
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return main.getMoneyManager().get().getConfigurationSection("player").isSet(player.getUniqueId().toString());
+        if (!main.isMySQLUse()) {
+            ConfigurationSection section = main.getMoneyManager().get().getConfigurationSection("player");
+            if (section == null) return false;
+            return section.isSet(player.getUniqueId().toString());
         }
+        return true;
     }
 
     @Deprecated
@@ -114,11 +108,7 @@ public class EconomyManager implements Economy {
     public double getBalance(OfflinePlayer player) {
         String playerUuid = player.getUniqueId().toString();
         if (main.isMySQLUse()) {
-            try {
-                return main.getDatabase().getPlayerMoney(playerUuid);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            return main.getPlayerDataManager().getCache(UUID.fromString(playerUuid)).getMoney();
         } else {
             return main.getMoneyManager().get().getLong("player." + playerUuid);
         }
@@ -136,11 +126,7 @@ public class EconomyManager implements Economy {
     public double getBalance(OfflinePlayer player, String world) {
         String playerUuid = player.getUniqueId().toString();
         if (main.isMySQLUse()) {
-            try {
-                return main.getDatabase().getPlayerMoney(playerUuid);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            return main.getPlayerDataManager().getCache(UUID.fromString(playerUuid)).getMoney();
         } else {
             return main.getMoneyManager().get().getLong("player." + playerUuid);
         }
@@ -176,17 +162,13 @@ public class EconomyManager implements Economy {
         if (!hasAccount(player)) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
-        double withdrawedMoney = getBalance(player) - amount;
+        double withdrewMoney = getBalance(player) - amount;
         if (main.isMySQLUse()) {
-            try {
-                main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) withdrawedMoney));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            main.getPlayerDataManager().getCache(player.getUniqueId()).afterWithdraw((long) withdrewMoney);
         } else {
-            main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
+            main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrewMoney);
         }
-        return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
+        return new EconomyResponse(amount, withdrewMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
     @Deprecated
@@ -199,17 +181,13 @@ public class EconomyManager implements Economy {
         if (!hasAccount(player)) {
             return new EconomyResponse(0, 0, EconomyResponse.ResponseType.FAILURE, "The player doesn't has an Account!");
         }
-        double withdrawedMoney = getBalance(player) - amount;
+        double withdrewMoney = getBalance(player) - amount;
         if (main.isMySQLUse()) {
-            try {
-                main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) withdrawedMoney));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            main.getPlayerDataManager().getCache(player.getUniqueId()).afterWithdraw((long) withdrewMoney);
         } else {
-            main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrawedMoney);
+            main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) withdrewMoney);
         }
-        return new EconomyResponse(amount, withdrawedMoney, EconomyResponse.ResponseType.SUCCESS, "");
+        return new EconomyResponse(amount, withdrewMoney, EconomyResponse.ResponseType.SUCCESS, "");
     }
 
     @Deprecated
@@ -224,11 +202,7 @@ public class EconomyManager implements Economy {
         }
         double depositedMoney = getBalance(player) + amount;
         if (main.isMySQLUse()) {
-            try {
-                main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) depositedMoney));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            main.getPlayerDataManager().getCache(player.getUniqueId()).afterDeposit((long) depositedMoney);
         } else {
             main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
         }
@@ -247,11 +221,7 @@ public class EconomyManager implements Economy {
         }
         double depositedMoney = getBalance(player) + amount;
         if (main.isMySQLUse()) {
-            try {
-                main.getDatabase().updatePlayerStats(new PlayerData(player.getUniqueId().toString(), (long) depositedMoney));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            main.getPlayerDataManager().getCache(player.getUniqueId()).afterDeposit((long) depositedMoney);
         } else {
             main.getMoneyManager().get().set("player." + player.getUniqueId(), (long) depositedMoney);
         }
@@ -325,13 +295,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
-        if (main.isMySQLUse()) {
-            try {
-                main.getDatabase().createPlayerStats(new PlayerData(player.getUniqueId().toString(), 0));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
+        if (!main.isMySQLUse()) {
             main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
         }
         return true;
@@ -344,13 +308,7 @@ public class EconomyManager implements Economy {
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player, String worldName) {
-        if (main.isMySQLUse()) {
-            try {
-                main.getDatabase().createPlayerStats(new PlayerData(player.getUniqueId().toString(), 0));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
+        if (!main.isMySQLUse()) {
             main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
         }
         return true;
