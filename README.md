@@ -3,9 +3,9 @@
 경제 플러그인입니다.
 
 ### Use Paper Version:
-1.18.2
+1.19.2
 ### Tested Paper Version:
-1.18.2
+1.19.2
 ### Required Plugin:
 - Vault
 - PlaceholderAPI (Optional)
@@ -35,6 +35,9 @@
 
 ### 플러그인 리로드 기능
 /uconomy reload 명령어를 사용하여 플러그인을 리로드할 수 있습니다.
+
+### MySQL 저장 방식 지원  
+config 파일에서 MySQL 저장 방식을 사용할 것인지 yml 파일 저장 방식을 사용할 것인지 설정할 수 있습니다.
 
 ### Uconomy Placeholders
 - %uconomy_balance%
