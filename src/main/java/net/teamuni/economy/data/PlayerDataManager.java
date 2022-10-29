@@ -18,11 +18,9 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 
 public class PlayerDataManager implements Listener {
-    private final Uconomy main;
     private final LoadingCache<UUID, PlayerData> cache;
 
     public PlayerDataManager(Uconomy instance) {
-        this.main = instance;
         this.cache = CacheBuilder.newBuilder().removalListener(
                         RemovalListeners.asynchronous((RemovalListener<UUID, PlayerData>) notify -> {
                             PlayerData data = notify.getValue();
