@@ -35,20 +35,20 @@ public class UconomyCmd implements CommandExecutor {
                                 case 1 ->
                                         main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("check_my_money")
                                                 , "%name_of_player%", player.getName()
-                                                , "%player_money%", df.format(main.getEconomyManager().getBalance(player)));
+                                                , "%player_money%", df.format(main.getMoneyManager().getBalance(player)));
                                 case 2 -> {
                                     if (!player.hasPermission("ucon.manage")) {
                                         main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("not_available_command"));
                                         return false;
                                     }
                                     OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-                                    if (target == null || main.getEconomyManager().hasAccount(target)) {
+                                    if (target == null || main.getMoneyManager().hasAccount(target)) {
                                         main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                         return false;
                                     }
                                     main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("check_the_other_player_money")
                                             , "%name_of_player%", target.getName()
-                                            , "%player_money%", df.format(main.getEconomyManager().getBalance(target)));
+                                            , "%player_money%", df.format(main.getMoneyManager().getBalance(target)));
                                 }
                                 default ->
                                         main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("not_available_command"));
@@ -61,7 +61,7 @@ public class UconomyCmd implements CommandExecutor {
                             }
                             OfflinePlayer recipient = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                            if (recipient == null || main.getEconomyManager().hasAccount(recipient)) {
+                            if (recipient == null || main.getMoneyManager().hasAccount(recipient)) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                 return false;
                             }
@@ -73,7 +73,7 @@ public class UconomyCmd implements CommandExecutor {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("invalid_syntax"));
                                 return false;
                             }
-                            if (!main.getEconomyManager().has(player, Long.parseLong(args[2]))) {
+                            if (!main.getMoneyManager().has(player, Long.parseLong(args[2]))) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("money_shortage"));
                                 return false;
                             }
@@ -82,13 +82,13 @@ public class UconomyCmd implements CommandExecutor {
                                         , "%value_of_minimum%", df.format(main.getConfig().getLong("minimum_amount")));
                                 return false;
                             }
-                            main.getEconomyManager().withdrawPlayer(player, Long.parseLong(args[2]));
-                            main.getEconomyManager().depositPlayer(recipient, Long.parseLong(args[2]));
+                            main.getMoneyManager().withdrawPlayer(player, Long.parseLong(args[2]));
+                            main.getMoneyManager().depositPlayer(recipient, Long.parseLong(args[2]));
 
                             main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("transaction_confirm_to_sender")
                                     , "%name_of_recipient%", recipient.getName()
                                     , "%sent_money%", df.format(Long.parseLong(args[2]))
-                                    , "%sender_money_after_transaction%", df.format(main.getEconomyManager().getBalance(player)));
+                                    , "%sender_money_after_transaction%", df.format(main.getMoneyManager().getBalance(player)));
 
                             if (recipient.isOnline()) {
                                 Player onlineRecipient = recipient.getPlayer();
@@ -96,7 +96,7 @@ public class UconomyCmd implements CommandExecutor {
                                 main.getMessageManager().sendTranslatedMsgs(onlineRecipient, this.messageListMap.get("transaction_confirm_to_recipient")
                                         , "%name_of_sender%", player.getName()
                                         , "%received_money%", df.format(Long.parseLong(args[2]))
-                                        , "%recipient_money_after_transaction%", df.format(main.getEconomyManager().getBalance(recipient)));
+                                        , "%recipient_money_after_transaction%", df.format(main.getMoneyManager().getBalance(recipient)));
                             }
                             break;
                         case "지급", "차감", "설정":
@@ -110,7 +110,7 @@ public class UconomyCmd implements CommandExecutor {
                             }
                             OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                            if (target == null || main.getEconomyManager().hasAccount(target)) {
+                            if (target == null || main.getMoneyManager().hasAccount(target)) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                 return false;
                             }
@@ -119,7 +119,7 @@ public class UconomyCmd implements CommandExecutor {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("지급")) {
-                                main.getEconomyManager().depositPlayer(target, Long.parseLong(args[2]));
+                                main.getMoneyManager().depositPlayer(target, Long.parseLong(args[2]));
 
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("increase_player_money")
                                         , "%name_of_player%", target.getName()
@@ -127,10 +127,10 @@ public class UconomyCmd implements CommandExecutor {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("차감")) {
-                                main.getEconomyManager().withdrawPlayer(target, Long.parseLong(args[2]));
+                                main.getMoneyManager().withdrawPlayer(target, Long.parseLong(args[2]));
 
-                                if (main.getEconomyManager().getBalance(target) < 0) {
-                                    main.getEconomyManager().depositPlayer(target, main.getEconomyManager().getBalance(target) * -1);
+                                if (main.getMoneyManager().getBalance(target) < 0) {
+                                    main.getMoneyManager().depositPlayer(target, main.getMoneyManager().getBalance(target) * -1);
                                 }
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("decrease_player_money")
                                         , "%name_of_player%", target.getName()
@@ -138,8 +138,8 @@ public class UconomyCmd implements CommandExecutor {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("설정")) {
-                                main.getEconomyManager().withdrawPlayer(target, main.getEconomyManager().getBalance(target));
-                                main.getEconomyManager().depositPlayer(target, Long.parseLong(args[2]));
+                                main.getMoneyManager().withdrawPlayer(target, main.getMoneyManager().getBalance(target));
+                                main.getMoneyManager().depositPlayer(target, Long.parseLong(args[2]));
 
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("set_player_money")
                                         , "%name_of_player%", target.getName()

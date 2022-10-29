@@ -8,7 +8,6 @@ import net.teamuni.economy.data.MoneyManager;
 import net.teamuni.economy.data.PlayerDataManager;
 import net.teamuni.economy.database.MySQLDatabase;
 import net.teamuni.economy.event.JoinEvent;
-import net.teamuni.economy.data.EconomyManager;
 import net.teamuni.economy.hooks.UconomyPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,7 +16,6 @@ import java.util.logging.Level;
 
 @Getter
 public final class Uconomy extends JavaPlugin {
-    private EconomyManager economyManager;
     private MessageManager messageManager;
     private MoneyManager moneyManager;
     private MySQLDatabase database;
@@ -26,7 +24,6 @@ public final class Uconomy extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.economyManager = new EconomyManager(this);
         this.messageManager = new MessageManager(this);
         this.moneyManager = new MoneyManager(this);
         this.messageManager.createMessagesYml();
