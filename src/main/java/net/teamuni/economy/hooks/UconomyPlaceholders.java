@@ -38,8 +38,7 @@ public class UconomyPlaceholders extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("balance")) {
             if (main.isMySQLUse()) {
                 PlayerData cacheIfPresent = main.getPlayerDataManager().getCacheIfPresent(player.getUniqueId());
-                PlayerData cacheUnchecked = main.getPlayerDataManager().getCache(player.getUniqueId());
-                return cacheIfPresent == null ? df.format(cacheUnchecked.getMoney()) : df.format(cacheIfPresent.getMoney());
+                return cacheIfPresent == null ? "0" : df.format(cacheIfPresent.getMoney());
             }
             return df.format(main.getMoneyManager().get().getLong("player." + player.getUniqueId()));
         }

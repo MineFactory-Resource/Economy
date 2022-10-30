@@ -18,6 +18,9 @@ public class JoinEvent implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
+            if (main.isMySQLUse()) {
+                main.getPlayerDataManager().getCache(player.getUniqueId());
+            }
             if (main.getMoneyManager().hasAccount(player)) {
                 main.getMoneyManager().createPlayerAccount(player);
                 Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");

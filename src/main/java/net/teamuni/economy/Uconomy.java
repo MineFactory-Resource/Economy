@@ -55,9 +55,10 @@ public final class Uconomy extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        this.moneyManager.save();
         if (isMySQLUse) {
             this.playerDataManager.removeAll();
+        } else {
+            this.moneyManager.save();
         }
     }
 }
