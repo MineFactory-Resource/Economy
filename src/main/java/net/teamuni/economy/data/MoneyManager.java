@@ -8,32 +8,38 @@ import java.io.File;
 import java.io.IOException;
 
 public class MoneyManager {
-    private static final Uconomy main = Uconomy.getPlugin(Uconomy.class);
-    private static File file;
-    private static FileConfiguration commandsFile;
-
-    public static void createMoneyDataYml() {
+    private final Uconomy main;
+    private File file = null;
+    private FileConfiguration moneyDataFile = null;
+    public MoneyManager(Uconomy instance) {
+        this.main = instance;
+    }
+    public void createMoneyDataYml() {
         file = new File(main.getDataFolder(), "moneydata.yml");
 
         if (!file.exists()) {
             main.saveResource("moneydata.yml", false);
         }
-        commandsFile = YamlConfiguration.loadConfiguration(file);
+        moneyDataFile = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static FileConfiguration get() {
-        return commandsFile;
+    public FileConfiguration get() {
+        return moneyDataFile;
     }
 
-    public static void save() {
+    public void save() {
+        if (this.file == null || this.moneyDataFile == null) return;
         try {
-            commandsFile.save(file);
+            moneyDataFile.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void reload() {
-        commandsFile = YamlConfiguration.loadConfiguration(file);
+    public void reload() {
+        if (this.file == null) {
+            this.file = new File(main.getDataFolder(), "moneydata.yml");
+        }
+        moneyDataFile = YamlConfiguration.loadConfiguration(file);
     }
 }

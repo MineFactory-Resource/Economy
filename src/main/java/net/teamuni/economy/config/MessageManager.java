@@ -13,36 +13,44 @@ import java.io.IOException;
 import java.util.List;
 
 public class MessageManager {
-    private static final Uconomy main = Uconomy.getPlugin(Uconomy.class);
-    private static File file;
-    private static FileConfiguration commandsFile;
+    private final Uconomy main;
+    private File file = null;
+    private FileConfiguration messagesFile = null;
+    public MessageManager(Uconomy instance) {
+        this.main = instance;
+    }
 
-    public static void createMessagesYml() {
-        file = new File(main.getDataFolder(), "messages.yml");
-
+    public void createMessagesYml() {
+        if (this.file == null) {
+            this.file = new File(main.getDataFolder(), "messages.yml");
+        }
         if (!file.exists()) {
             main.saveResource("messages.yml", false);
         }
-        commandsFile = YamlConfiguration.loadConfiguration(file);
+        this.messagesFile = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static FileConfiguration get() {
-        return commandsFile;
+    public FileConfiguration get() {
+        return messagesFile;
     }
 
-    public static void save() {
+    public void save() {
+        if (this.file == null || this.messagesFile == null) return;
         try {
-            commandsFile.save(file);
+            this.messagesFile.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void reload() {
-        commandsFile = YamlConfiguration.loadConfiguration(file);
+    public void reload() {
+        if (this.file == null) {
+            this.file = new File(main.getDataFolder(), "messages.yml");
+        }
+        this.messagesFile = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static void sendTranslatedMsgs(Player player, List<String> msgList) {
+    public void sendTranslatedMsgs(Player player, List<String> msgList) {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(player, msgList);
             for (String msgs : translatedMsgs) {
@@ -55,7 +63,7 @@ public class MessageManager {
         }
     }
 
-    public static void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg) {
+    public void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg) {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(player, msgList);
             for (String msgs : translatedMsgs) {
@@ -72,7 +80,7 @@ public class MessageManager {
         }
     }
 
-    public static void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg, String msg2, String transMsg2) {
+    public void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg, String msg2, String transMsg2) {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(player, msgList);
             for (String msgs : translatedMsgs) {
@@ -91,7 +99,7 @@ public class MessageManager {
         }
     }
 
-    public static void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg, String msg2, String transMsg2, String msg3, String transMsg3) {
+    public void sendTranslatedMsgs(Player player, List<String> msgList, String msg, String transMsg, String msg2, String transMsg2, String msg3, String transMsg3) {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             List<String> translatedMsgs = PlaceholderAPI.setPlaceholders(player, msgList);
             for (String msgs : translatedMsgs) {

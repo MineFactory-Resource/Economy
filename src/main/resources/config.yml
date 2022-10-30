@@ -1,1 +1,12 @@
+# 돈 보내기 기능의 최소 금액
 minimum_amount: 1
+#MySQL 사용 여부
+mysql_use: false
+#MySQL Config
+MySQL:
+  Host: 127.0.0.1
+  Port: 3306
+  Parameters: '?characterEncoding=utf8&autoReconnect=true'
+  Database: uconomy
+  Username: username
+  Password: 'abc123'

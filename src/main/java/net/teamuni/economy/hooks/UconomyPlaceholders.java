@@ -2,7 +2,7 @@ package net.teamuni.economy.hooks;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.teamuni.economy.Uconomy;
-import net.teamuni.economy.data.MoneyManager;
+import net.teamuni.economy.data.PlayerData;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,10 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import java.text.DecimalFormat;
 
 public class UconomyPlaceholders extends PlaceholderExpansion {
-
-    DecimalFormat df = new DecimalFormat("###,###");
-
-    private final Uconomy main = Uconomy.getInstance();
+    private final DecimalFormat df = new DecimalFormat("###,###");
+    private final Uconomy main = Uconomy.getPlugin(Uconomy.class);
 
     @Override
     public @NotNull String getAuthor() {
@@ -38,7 +36,11 @@ public class UconomyPlaceholders extends PlaceholderExpansion {
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         if (params.equalsIgnoreCase("balance")) {
-            return df.format(MoneyManager.get().getLong("player." + player.getUniqueId()));
+            if (main.isMySQLUse()) {
+                PlayerData cacheIfPresent = main.getPlayerDataManager().getCacheIfPresent(player.getUniqueId());
+                return cacheIfPresent == null ? "0" : df.format(cacheIfPresent.getMoney());
+            }
+            return df.format(main.getMoneyManager().get().getLong("player." + player.getUniqueId()));
         }
         if (params.equalsIgnoreCase("minimum_value")) {
             return df.format(main.getConfig().getLong("minimum_amount"));
