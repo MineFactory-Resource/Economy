@@ -8,6 +8,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.util.UUID;
+
 public class JoinEvent implements Listener {
     private final Uconomy main;
     public JoinEvent(Uconomy instance) {
@@ -17,13 +19,12 @@ public class JoinEvent implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        UUID playerUUID = player.getUniqueId();
         Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
             if (main.isMySQLUse()) {
-                main.getPlayerDataManager().getCache(player.getUniqueId());
-            }
-            if (main.getMoneyManager().hasAccount(player)) {
-                main.getMoneyManager().createPlayerAccount(player);
-                Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
+                main.getPlayerDataManagerMySQL().getCache(playerUUID);
+            } else {
+                main.getPlayerDataManagerYML().getCache(playerUUID);
             }
         });
     }

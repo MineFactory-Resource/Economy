@@ -36,11 +36,13 @@ public class UconomyPlaceholders extends PlaceholderExpansion {
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         if (params.equalsIgnoreCase("balance")) {
+            PlayerData cacheIfPresent;
             if (main.isMySQLUse()) {
-                PlayerData cacheIfPresent = main.getPlayerDataManager().getCacheIfPresent(player.getUniqueId());
-                return cacheIfPresent == null ? "0" : df.format(cacheIfPresent.getMoney());
+                cacheIfPresent = main.getPlayerDataManagerMySQL().getCacheIfPresent(player.getUniqueId());
+            } else {
+                cacheIfPresent = main.getPlayerDataManagerYML().getCacheIfPresent(player.getUniqueId());
             }
-            return df.format(main.getMoneyManager().get().getLong("player." + player.getUniqueId()));
+            return cacheIfPresent == null ? "0" : df.format(cacheIfPresent.getMoney());
         }
         if (params.equalsIgnoreCase("minimum_value")) {
             return df.format(main.getConfig().getLong("minimum_amount"));
