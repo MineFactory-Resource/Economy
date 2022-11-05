@@ -47,7 +47,7 @@ public class UconomyCmd implements CommandExecutor {
                                         main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                         return false;
                                     }
-                                    if (hasNoAccount(target.getUniqueId())) {
+                                    if (!hasAccount(target.getUniqueId())) {
                                         main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                         return false;
                                     }
@@ -66,11 +66,11 @@ public class UconomyCmd implements CommandExecutor {
                             }
                             OfflinePlayer recipient = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                            if (recipient == null || hasNoAccount(recipient.getUniqueId())) {
+                            if (recipient == null) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                 return false;
                             }
-                            if (hasNoAccount(recipient.getUniqueId())) {
+                            if (!hasAccount(recipient.getUniqueId())) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                 return false;
                             }
@@ -123,7 +123,7 @@ public class UconomyCmd implements CommandExecutor {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                 return false;
                             }
-                            if (hasNoAccount(target.getUniqueId())) {
+                            if (!hasAccount(target.getUniqueId())) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                 return false;
                             }
@@ -194,11 +194,11 @@ public class UconomyCmd implements CommandExecutor {
         }
     }
 
-    private boolean hasNoAccount(UUID uuid) {
+    private boolean hasAccount(UUID uuid) {
         if (main.isMySQLUse()) {
-            return !main.getPlayerDataManagerMySQL().hasAccount(uuid);
+            return main.getPlayerDataManagerMySQL().hasAccount(uuid);
         } else {
-            return !main.getPlayerDataManagerYML().hasAccount(uuid);
+            return main.getPlayerDataManagerYML().hasAccount(uuid);
         }
     }
 }

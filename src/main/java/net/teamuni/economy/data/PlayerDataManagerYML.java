@@ -6,6 +6,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalListeners;
 import net.teamuni.economy.Uconomy;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -88,5 +90,13 @@ public class PlayerDataManagerYML implements Listener, MoneyUpdater {
         ConfigurationSection section = main.getMoneyManager().get().getConfigurationSection("player");
         if (section == null) return false;
         return section.isSet(uuid.toString());
+    }
+
+    @Override
+    public boolean createPlayerAccount(OfflinePlayer player) {
+        Uconomy main = Uconomy.getPlugin(Uconomy.class);
+        main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
+        Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
+        return true;
     }
 }

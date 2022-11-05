@@ -7,6 +7,8 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalListeners;
 import net.teamuni.economy.Uconomy;
 import net.teamuni.economy.database.MySQLDatabase;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -114,12 +116,31 @@ public class PlayerDataManagerMySQL implements Listener, MoneyUpdater {
     public boolean hasAccount(UUID uuid) {
         try {
             Connection connection = main.getDatabase().getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT EXISTS (SELECT money FROM uc_stats WHERE uuid = ?)");
+            PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM uc_stats WHERE uuid = ?");
             statement.setString(1, uuid.toString());
 
             try (connection; statement) {
                 ResultSet result = statement.executeQuery();
                 return result.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean createPlayerAccount(OfflinePlayer player) {
+        try {
+            Connection connection = main.getDatabase().getConnection();
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO uc_stats (uuid, money) VALUE (?, ?)");
+            statement.setString(1, player.getUniqueId().toString());
+            statement.setLong(2, 0);
+
+            try (connection; statement) {
+                statement.executeUpdate();
+                Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
+                return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
