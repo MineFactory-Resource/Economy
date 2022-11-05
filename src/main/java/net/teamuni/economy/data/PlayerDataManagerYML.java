@@ -24,7 +24,7 @@ public class PlayerDataManagerYML implements Listener, MoneyUpdater {
     private final ConfigurationSection section;
 
     public PlayerDataManagerYML(Uconomy instance) {
-        this.section = instance.getMoneyManager().get().getConfigurationSection("Player");
+        this.section = instance.getMoneyManager().get().getConfigurationSection("player");
         this.cache = CacheBuilder.newBuilder().removalListener(
                         RemovalListeners.asynchronous((RemovalListener<UUID, PlayerData>) notify -> {
                             PlayerData data = notify.getValue();

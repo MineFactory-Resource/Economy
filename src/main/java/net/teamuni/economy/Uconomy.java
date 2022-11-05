@@ -46,6 +46,7 @@ public final class Uconomy extends JavaPlugin {
             Bukkit.getPluginManager().registerEvents(this.playerDataManagerMySQL, this);
         } else {
             this.playerDataManagerYML = new PlayerDataManagerYML(this);
+            Bukkit.getPluginManager().registerEvents(this.playerDataManagerYML, this);
         }
         Bukkit.getPluginManager().registerEvents(new JoinEvent(this), this);
         getCommand("돈").setExecutor(new UconomyCmd(this));
@@ -62,8 +63,8 @@ public final class Uconomy extends JavaPlugin {
         if (isMySQLUse) {
             this.playerDataManagerMySQL.removeAll();
         } else {
-            this.moneyManager.save();
             this.playerDataManagerYML.removeAll();
+            this.moneyManager.save();
         }
     }
 }
