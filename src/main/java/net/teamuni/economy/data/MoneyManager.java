@@ -2,7 +2,6 @@ package net.teamuni.economy.data;
 
 import net.teamuni.economy.Uconomy;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -64,39 +63,12 @@ public class MoneyManager {
         return result.toString();
     }
 
-    public boolean hasAccount(OfflinePlayer player) {
-        if (!main.isMySQLUse()) {
-            ConfigurationSection section = main.getMoneyManager().get().getConfigurationSection("player");
-            if (section == null) return false;
-            return section.isSet(player.getUniqueId().toString());
-        }
-        return true;
-    }
-
-    public boolean hasAccount(OfflinePlayer player, String worldName) {
-        if (!main.isMySQLUse()) {
-            ConfigurationSection section = main.getMoneyManager().get().getConfigurationSection("player");
-            if (section == null) return false;
-            return section.isSet(player.getUniqueId().toString());
-        }
-        return true;
-    }
-
     public long getBalance(OfflinePlayer player) {
-        String playerUuid = player.getUniqueId().toString();
+        UUID playerUUID = player.getUniqueId();
         if (main.isMySQLUse()) {
-            return main.getPlayerDataManager().getCache(UUID.fromString(playerUuid)).getMoney();
+            return main.getPlayerDataManagerMySQL().getCache(playerUUID).getMoney();
         } else {
-            return main.getMoneyManager().get().getLong("player." + playerUuid);
-        }
-    }
-
-    public long getBalance(OfflinePlayer player, String world) {
-        String playerUuid = player.getUniqueId().toString();
-        if (main.isMySQLUse()) {
-            return main.getPlayerDataManager().getCache(UUID.fromString(playerUuid)).getMoney();
-        } else {
-            return main.getMoneyManager().get().getLong("player." + playerUuid);
+            return main.getPlayerDataManagerYML().getCache(playerUUID).getMoney();
         }
     }
 
@@ -104,56 +76,21 @@ public class MoneyManager {
         return getBalance(player) >= amount;
     }
 
-
-    public boolean has(OfflinePlayer player, String worldName, long amount) {
-        return getBalance(player) >= amount;
-    }
-
     public void withdrawPlayer(OfflinePlayer player, long amount) {
         long withdrewMoney = getBalance(player) - amount;
         if (main.isMySQLUse()) {
-            main.getPlayerDataManager().getCache(player.getUniqueId()).afterWithdraw(withdrewMoney);
+            main.getPlayerDataManagerMySQL().getCache(player.getUniqueId()).afterWithdraw(withdrewMoney);
         } else {
-            main.getMoneyManager().get().set("player." + player.getUniqueId(), withdrewMoney);
-        }
-    }
-
-    public void withdrawPlayer(OfflinePlayer player, String worldName, long amount) {
-        long withdrewMoney = getBalance(player) - amount;
-        if (main.isMySQLUse()) {
-            main.getPlayerDataManager().getCache(player.getUniqueId()).afterWithdraw(withdrewMoney);
-        } else {
-            main.getMoneyManager().get().set("player." + player.getUniqueId(), withdrewMoney);
+            main.getPlayerDataManagerYML().getCache(player.getUniqueId()).afterWithdraw(withdrewMoney);
         }
     }
 
     public void depositPlayer(OfflinePlayer player, long amount) {
         long depositedMoney = getBalance(player) + amount;
         if (main.isMySQLUse()) {
-            main.getPlayerDataManager().getCache(player.getUniqueId()).afterDeposit(depositedMoney);
+            main.getPlayerDataManagerMySQL().getCache(player.getUniqueId()).afterDeposit(depositedMoney);
         } else {
-            main.getMoneyManager().get().set("player." + player.getUniqueId(), depositedMoney);
-        }
-    }
-
-    public void depositPlayer(OfflinePlayer player, String worldName, long amount) {
-        long depositedMoney = getBalance(player) + amount;
-        if (main.isMySQLUse()) {
-            main.getPlayerDataManager().getCache(player.getUniqueId()).afterDeposit(depositedMoney);
-        } else {
-            main.getMoneyManager().get().set("player." + player.getUniqueId(), depositedMoney);
-        }
-    }
-
-    public void createPlayerAccount(OfflinePlayer player) {
-        if (!main.isMySQLUse()) {
-            main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
-        }
-    }
-
-    public void createPlayerAccount(OfflinePlayer player, String worldName) {
-        if (!main.isMySQLUse()) {
-            main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
+            main.getPlayerDataManagerYML().getCache(player.getUniqueId()).afterDeposit(depositedMoney);
         }
     }
 }

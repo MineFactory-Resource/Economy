@@ -5,7 +5,8 @@ import net.teamuni.economy.command.CommandTabCompleter;
 import net.teamuni.economy.command.UconomyCmd;
 import net.teamuni.economy.config.MessageManager;
 import net.teamuni.economy.data.MoneyManager;
-import net.teamuni.economy.data.PlayerDataManager;
+import net.teamuni.economy.data.PlayerDataManagerMySQL;
+import net.teamuni.economy.data.PlayerDataManagerYML;
 import net.teamuni.economy.database.MySQLDatabase;
 import net.teamuni.economy.event.JoinEvent;
 import net.teamuni.economy.hooks.UconomyPlaceholders;
@@ -19,7 +20,8 @@ public final class Uconomy extends JavaPlugin {
     private MessageManager messageManager;
     private MoneyManager moneyManager;
     private MySQLDatabase database;
-    private PlayerDataManager playerDataManager;
+    private PlayerDataManagerMySQL playerDataManagerMySQL;
+    private PlayerDataManagerYML playerDataManagerYML;
     private boolean isMySQLUse = false;
 
     @Override
@@ -40,8 +42,10 @@ public final class Uconomy extends JavaPlugin {
                 getLogger().log(Level.SEVERE, "데이터베이스 연결에 실패하였습니다.", e);
                 this.database = null;
             }
-            this.playerDataManager = new PlayerDataManager(this);
-            Bukkit.getPluginManager().registerEvents(this.playerDataManager, this);
+            this.playerDataManagerMySQL = new PlayerDataManagerMySQL(this);
+            Bukkit.getPluginManager().registerEvents(this.playerDataManagerMySQL, this);
+        } else {
+            this.playerDataManagerYML = new PlayerDataManagerYML(this);
         }
         Bukkit.getPluginManager().registerEvents(new JoinEvent(this), this);
         getCommand("돈").setExecutor(new UconomyCmd(this));
@@ -56,9 +60,10 @@ public final class Uconomy extends JavaPlugin {
     @Override
     public void onDisable() {
         if (isMySQLUse) {
-            this.playerDataManager.removeAll();
+            this.playerDataManagerMySQL.removeAll();
         } else {
             this.moneyManager.save();
+            this.playerDataManagerYML.removeAll();
         }
     }
 }

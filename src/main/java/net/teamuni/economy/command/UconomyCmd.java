@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class UconomyCmd implements CommandExecutor {
     private final Map<String, List<String>> messageListMap = new HashMap<>();
@@ -42,7 +43,11 @@ public class UconomyCmd implements CommandExecutor {
                                         return false;
                                     }
                                     OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-                                    if (target == null || main.getMoneyManager().hasAccount(target)) {
+                                    if (target == null) {
+                                        main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
+                                        return false;
+                                    }
+                                    if (hasNoAccount(target.getUniqueId())) {
                                         main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                         return false;
                                     }
@@ -61,7 +66,11 @@ public class UconomyCmd implements CommandExecutor {
                             }
                             OfflinePlayer recipient = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                            if (recipient == null || main.getMoneyManager().hasAccount(recipient)) {
+                            if (recipient == null || hasNoAccount(recipient.getUniqueId())) {
+                                main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
+                                return false;
+                            }
+                            if (hasNoAccount(recipient.getUniqueId())) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                 return false;
                             }
@@ -110,7 +119,11 @@ public class UconomyCmd implements CommandExecutor {
                             }
                             OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                            if (target == null || main.getMoneyManager().hasAccount(target)) {
+                            if (target == null) {
+                                main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
+                                return false;
+                            }
+                            if (hasNoAccount(target.getUniqueId())) {
                                 main.getMessageManager().sendTranslatedMsgs(player, this.messageListMap.get("incorrect_player_name"));
                                 return false;
                             }
@@ -178,6 +191,14 @@ public class UconomyCmd implements CommandExecutor {
         for (String key : section.getKeys(false)) {
             List<String> messages = section.getStringList(key);
             this.messageListMap.put(key, messages);
+        }
+    }
+
+    private boolean hasNoAccount(UUID uuid) {
+        if (main.isMySQLUse()) {
+            return !main.getPlayerDataManagerMySQL().hasAccount(uuid);
+        } else {
+            return !main.getPlayerDataManagerYML().hasAccount(uuid);
         }
     }
 }
