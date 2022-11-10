@@ -6,9 +6,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalListeners;
 import net.teamuni.economy.Uconomy;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
+import net.teamuni.economy.database.MySQLDatabase;
+import net.teamuni.economy.database.YMLDatabase;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,27 +18,41 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
-public class PlayerDataManagerYML implements Listener, MoneyUpdater {
+public class PlayerDataManager implements Listener {
     private final LoadingCache<UUID, PlayerData> cache;
-    private final ConfigurationSection section;
 
-    public PlayerDataManagerYML(Uconomy instance) {
-        this.section = instance.getMoneyManager().get().getConfigurationSection("player");
+    public PlayerDataManager(Uconomy instance) {
         this.cache = CacheBuilder.newBuilder().removalListener(
                         RemovalListeners.asynchronous((RemovalListener<UUID, PlayerData>) notify -> {
                             PlayerData data = notify.getValue();
                             if (data == null) return;
-                            if (section == null) return;
-                            updatePlayerStats(data);
+                            if (instance.isMySQLUse()) {
+                                MySQLDatabase database = instance.getMySQLDatabase();
+                                if (database == null) return;
+                                database.updatePlayerStats(data);
+                            } else {
+                                YMLDatabase database = instance.getYmlDatabase();
+                                if (database == null) return;
+                                database.updatePlayerStats(data);
+                            }
                         }, Executors.newFixedThreadPool(5)))
                 .build(new CacheLoader<>() {
 
                     @Override
                     public @NotNull PlayerData load(@NotNull UUID uuid) {
-                        if (section == null) {
-                            return new PlayerData(uuid.toString(), 0);
+                        if (instance.isMySQLUse()) {
+                            MySQLDatabase database = instance.getMySQLDatabase();
+                            if (database == null) {
+                                return new PlayerData(uuid.toString(), 0);
+                            }
+                            return database.loadPlayerStats(uuid);
+                        } else {
+                            YMLDatabase database = instance.getYmlDatabase();
+                            if (database == null) {
+                                return new PlayerData(uuid.toString(), 0);
+                            }
+                            return database.loadPlayerStats(uuid);
                         }
-                        return loadPlayerStats(uuid);
                     }
                 });
     }
@@ -67,36 +80,5 @@ public class PlayerDataManagerYML implements Listener, MoneyUpdater {
     @Nullable
     public PlayerData getCacheIfPresent(@NotNull UUID uuid) {
         return this.cache.getIfPresent(uuid);
-    }
-
-    @Override
-    public void updatePlayerStats(PlayerData stats) {
-        section.set(stats.getUuid(), stats.getMoney());
-    }
-
-    @Override
-    public PlayerData loadPlayerStats(UUID uuid) {
-        String playerUUID = uuid.toString();
-        if (section.isSet(uuid.toString())) {
-            long money = section.getLong(playerUUID);
-            return new PlayerData(playerUUID, money);
-        }
-        return new PlayerData(playerUUID, 0);
-    }
-
-    @Override
-    public boolean hasAccount(UUID uuid) {
-        Uconomy main = Uconomy.getPlugin(Uconomy.class);
-        ConfigurationSection section = main.getMoneyManager().get().getConfigurationSection("player");
-        if (section == null) return false;
-        return section.isSet(uuid.toString());
-    }
-
-    @Override
-    public boolean createPlayerAccount(OfflinePlayer player) {
-        Uconomy main = Uconomy.getPlugin(Uconomy.class);
-        main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
-        Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
-        return true;
     }
 }

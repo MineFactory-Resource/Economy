@@ -196,9 +196,9 @@ public class UconomyCmd implements CommandExecutor {
 
     private boolean hasAccount(UUID uuid) {
         if (main.isMySQLUse()) {
-            return main.getPlayerDataManagerMySQL().hasAccount(uuid);
+            return main.getMySQLDatabase().hasAccount(uuid);
         } else {
-            return main.getPlayerDataManagerYML().hasAccount(uuid);
+            return main.getYmlDatabase().hasAccount(uuid);
         }
     }
 }

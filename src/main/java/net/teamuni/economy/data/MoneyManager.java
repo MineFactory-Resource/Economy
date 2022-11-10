@@ -14,9 +14,11 @@ public class MoneyManager {
     private final Uconomy main;
     private File file = null;
     private FileConfiguration moneyDataFile = null;
+
     public MoneyManager(Uconomy instance) {
         this.main = instance;
     }
+
     public void createMoneyDataYml() {
         file = new File(main.getDataFolder(), "moneydata.yml");
 
@@ -65,11 +67,7 @@ public class MoneyManager {
 
     public long getBalance(OfflinePlayer player) {
         UUID playerUUID = player.getUniqueId();
-        if (main.isMySQLUse()) {
-            return main.getPlayerDataManagerMySQL().getCache(playerUUID).getMoney();
-        } else {
-            return main.getPlayerDataManagerYML().getCache(playerUUID).getMoney();
-        }
+        return main.getPlayerDataManager().getCache(playerUUID).getMoney();
     }
 
     public boolean has(OfflinePlayer player, long amount) {
@@ -78,19 +76,11 @@ public class MoneyManager {
 
     public void withdrawPlayer(OfflinePlayer player, long amount) {
         long withdrewMoney = getBalance(player) - amount;
-        if (main.isMySQLUse()) {
-            main.getPlayerDataManagerMySQL().getCache(player.getUniqueId()).afterWithdraw(withdrewMoney);
-        } else {
-            main.getPlayerDataManagerYML().getCache(player.getUniqueId()).afterWithdraw(withdrewMoney);
-        }
+        main.getPlayerDataManager().getCache(player.getUniqueId()).afterWithdraw(withdrewMoney);
     }
 
     public void depositPlayer(OfflinePlayer player, long amount) {
         long depositedMoney = getBalance(player) + amount;
-        if (main.isMySQLUse()) {
-            main.getPlayerDataManagerMySQL().getCache(player.getUniqueId()).afterDeposit(depositedMoney);
-        } else {
-            main.getPlayerDataManagerYML().getCache(player.getUniqueId()).afterDeposit(depositedMoney);
-        }
+        main.getPlayerDataManager().getCache(player.getUniqueId()).afterDeposit(depositedMoney);
     }
 }
