@@ -6,7 +6,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalListeners;
 import net.teamuni.economy.Uconomy;
-import net.teamuni.economy.database.MySQLDatabase;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,24 +23,20 @@ public class PlayerDataManager implements Listener {
         this.cache = CacheBuilder.newBuilder().removalListener(
                         RemovalListeners.asynchronous((RemovalListener<UUID, PlayerData>) notify -> {
                             PlayerData data = notify.getValue();
-                            if (data == null) {
-                                return;
-                            }
-                            MySQLDatabase database = instance.getDatabase();
-                            if (database == null) {
-                                return;
-                            }
-                            database.updatePlayerStats(data);
+                            MoneyUpdater updater = instance.getMoneyUpdater();
+                            if (data == null | updater == null) return;
+
+                            updater.updatePlayerStats(data);
                         }, Executors.newFixedThreadPool(5)))
                 .build(new CacheLoader<>() {
 
                     @Override
                     public @NotNull PlayerData load(@NotNull UUID uuid) {
-                        MySQLDatabase database = instance.getDatabase();
-                        if (database == null) {
+                        MoneyUpdater updater = instance.getMoneyUpdater();
+                        if (updater == null) {
                             return new PlayerData(uuid.toString(), 0);
                         }
-                        return database.loadPlayerStats(uuid);
+                        return updater.loadPlayerStats(uuid);
                     }
                 });
     }
@@ -71,4 +66,3 @@ public class PlayerDataManager implements Listener {
         return this.cache.getIfPresent(uuid);
     }
 }
-

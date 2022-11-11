@@ -2,7 +2,10 @@ package net.teamuni.economy.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import net.teamuni.economy.data.MoneyUpdater;
 import net.teamuni.economy.data.PlayerData;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,7 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.UUID;
 
-public class MySQLDatabase {
+public class MySQLDatabase implements MoneyUpdater {
     private final HikariDataSource sql;
 
     public MySQLDatabase(String host, int port, String database, String parameters, String user, String password) {
@@ -43,6 +46,7 @@ public class MySQLDatabase {
         }
     }
 
+    @Override
     public void updatePlayerStats(PlayerData stats) {
         try {
             Connection connection = this.sql.getConnection();
@@ -59,21 +63,59 @@ public class MySQLDatabase {
         }
     }
 
+    @Override
     public PlayerData loadPlayerStats(UUID uuid) {
+        String playerUUID = uuid.toString();
         try {
             Connection connection = this.sql.getConnection();
             PreparedStatement statement = connection.prepareStatement("SELECT money FROM uc_stats WHERE uuid = ?");
-            statement.setString(1, uuid.toString());
+            statement.setString(1, playerUUID);
 
             try (connection; statement) {
                 ResultSet result = statement.executeQuery();
                 if (result.next()) {
-                    return new PlayerData(uuid.toString(), result.getInt(1));
+                    return new PlayerData(playerUUID, result.getInt(1));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new PlayerData(uuid.toString(), 0);
+        return new PlayerData(playerUUID, 0);
+    }
+
+    @Override
+    public boolean hasAccount(UUID uuid) {
+        try {
+            Connection connection = this.sql.getConnection();
+            PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM uc_stats WHERE uuid = ?");
+            statement.setString(1, uuid.toString());
+
+            try (connection; statement) {
+                ResultSet result = statement.executeQuery();
+                return result.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean createPlayerAccount(OfflinePlayer player) {
+        try {
+            Connection connection = this.sql.getConnection();
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO uc_stats (uuid, money) VALUE (?, ?)");
+            statement.setString(1, player.getUniqueId().toString());
+            statement.setLong(2, 0);
+
+            try (connection; statement) {
+                statement.executeUpdate();
+                Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
