@@ -7,7 +7,6 @@
 ### Tested Paper Version:
 1.19.2
 ### Required Plugin:
-- Vault
 - PlaceholderAPI (Optional)
 ## Install Guide
 1. 최신 버전의 플러그인 파일을 다운로드합니다.
