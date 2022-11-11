@@ -9,11 +9,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.UUID;
 
 public class YMLDatabase {
+    private final Uconomy main;
     private final ConfigurationSection section;
 
     public YMLDatabase(Uconomy instance) {
+        this.main = instance;
         this.section = instance.getMoneyManager().get().getConfigurationSection("player");
-
     }
 
     public void updatePlayerStats(PlayerData stats) {
@@ -30,14 +31,11 @@ public class YMLDatabase {
     }
 
     public boolean hasAccount(UUID uuid) {
-        Uconomy main = Uconomy.getPlugin(Uconomy.class);
-        ConfigurationSection section = main.getMoneyManager().get().getConfigurationSection("player");
         if (section == null) return false;
         return section.isSet(uuid.toString());
     }
 
     public boolean createPlayerAccount(OfflinePlayer player) {
-        Uconomy main = Uconomy.getPlugin(Uconomy.class);
         main.getMoneyManager().get().set("player." + player.getUniqueId(), 0);
         Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
         return true;
