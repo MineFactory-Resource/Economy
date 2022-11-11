@@ -25,34 +25,21 @@ public class PlayerDataManager implements Listener {
         this.cache = CacheBuilder.newBuilder().removalListener(
                         RemovalListeners.asynchronous((RemovalListener<UUID, PlayerData>) notify -> {
                             PlayerData data = notify.getValue();
+                            MoneyUpdater updater = instance.getMoneyUpdater();
                             if (data == null) return;
-                            if (instance.isMySQLUse()) {
-                                MySQLDatabase database = instance.getMySQLDatabase();
-                                if (database == null) return;
-                                database.updatePlayerStats(data);
-                            } else {
-                                YMLDatabase database = instance.getYmlDatabase();
-                                if (database == null) return;
-                                database.updatePlayerStats(data);
-                            }
+                            if (updater == null) return;
+
+                            updater.updatePlayerStats(data);
                         }, Executors.newFixedThreadPool(5)))
                 .build(new CacheLoader<>() {
 
                     @Override
                     public @NotNull PlayerData load(@NotNull UUID uuid) {
-                        if (instance.isMySQLUse()) {
-                            MySQLDatabase database = instance.getMySQLDatabase();
-                            if (database == null) {
-                                return new PlayerData(uuid.toString(), 0);
-                            }
-                            return database.loadPlayerStats(uuid);
-                        } else {
-                            YMLDatabase database = instance.getYmlDatabase();
-                            if (database == null) {
-                                return new PlayerData(uuid.toString(), 0);
-                            }
-                            return database.loadPlayerStats(uuid);
+                        MoneyUpdater updater = instance.getMoneyUpdater();
+                        if (updater == null) {
+                            return new PlayerData(uuid.toString(), 0);
                         }
+                        return updater.loadPlayerStats(uuid);
                     }
                 });
     }

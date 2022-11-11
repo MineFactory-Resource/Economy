@@ -1,8 +1,7 @@
 package net.teamuni.economy.event;
 
 import net.teamuni.economy.Uconomy;
-import net.teamuni.economy.database.MySQLDatabase;
-import net.teamuni.economy.database.YMLDatabase;
+import net.teamuni.economy.data.MoneyUpdater;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,18 +21,11 @@ public class JoinEvent implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
-        MySQLDatabase mySQLDatabase = main.getMySQLDatabase();
-        YMLDatabase ymlDatabase = main.getYmlDatabase();
+        MoneyUpdater moneyUpdater = main.getMoneyUpdater();
 
         Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
-            if (main.isMySQLUse()) {
-                if (!mySQLDatabase.hasAccount(playerUUID)) {
-                    mySQLDatabase.createPlayerAccount(player);
-                }
-            } else {
-                if (!ymlDatabase.hasAccount(playerUUID)) {
-                    ymlDatabase.createPlayerAccount(player);
-                }
+            if (!moneyUpdater.hasAccount(playerUUID)) {
+                moneyUpdater.createPlayerAccount(player);
             }
             main.getPlayerDataManager().getCache(playerUUID);
         });

@@ -20,6 +20,7 @@ public class UconomyCmd implements CommandExecutor {
     private final Map<String, List<String>> messageListMap = new HashMap<>();
     private final Uconomy main;
     private final DecimalFormat df = new DecimalFormat("###,###");
+
     public UconomyCmd(Uconomy instance) {
         this.main = instance;
         getMessages();
@@ -195,10 +196,6 @@ public class UconomyCmd implements CommandExecutor {
     }
 
     private boolean hasAccount(UUID uuid) {
-        if (main.isMySQLUse()) {
-            return main.getMySQLDatabase().hasAccount(uuid);
-        } else {
-            return main.getYmlDatabase().hasAccount(uuid);
-        }
+        return main.getMoneyUpdater().hasAccount(uuid);
     }
 }

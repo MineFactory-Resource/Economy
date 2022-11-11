@@ -2,6 +2,7 @@ package net.teamuni.economy.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import net.teamuni.economy.data.MoneyUpdater;
 import net.teamuni.economy.data.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -13,7 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.UUID;
 
-public class MySQLDatabase {
+public class MySQLDatabase implements MoneyUpdater {
     private final HikariDataSource sql;
 
     public MySQLDatabase(String host, int port, String database, String parameters, String user, String password) {
@@ -45,6 +46,7 @@ public class MySQLDatabase {
         }
     }
 
+    @Override
     public void updatePlayerStats(PlayerData stats) {
         try {
             Connection connection = this.sql.getConnection();
@@ -61,6 +63,7 @@ public class MySQLDatabase {
         }
     }
 
+    @Override
     public PlayerData loadPlayerStats(UUID uuid) {
         String playerUUID = uuid.toString();
         try {
@@ -80,6 +83,7 @@ public class MySQLDatabase {
         return new PlayerData(playerUUID, 0);
     }
 
+    @Override
     public boolean hasAccount(UUID uuid) {
         try {
             Connection connection = this.sql.getConnection();
@@ -96,6 +100,7 @@ public class MySQLDatabase {
         return false;
     }
 
+    @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
         try {
             Connection connection = this.sql.getConnection();
