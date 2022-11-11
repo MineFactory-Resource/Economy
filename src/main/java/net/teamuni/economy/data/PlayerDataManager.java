@@ -6,8 +6,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalListeners;
 import net.teamuni.economy.Uconomy;
-import net.teamuni.economy.database.MySQLDatabase;
-import net.teamuni.economy.database.YMLDatabase;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
