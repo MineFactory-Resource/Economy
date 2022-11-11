@@ -26,8 +26,7 @@ public class PlayerDataManager implements Listener {
                         RemovalListeners.asynchronous((RemovalListener<UUID, PlayerData>) notify -> {
                             PlayerData data = notify.getValue();
                             MoneyUpdater updater = instance.getMoneyUpdater();
-                            if (data == null) return;
-                            if (updater == null) return;
+                            if (data == null | updater == null) return;
 
                             updater.updatePlayerStats(data);
                         }, Executors.newFixedThreadPool(5)))
