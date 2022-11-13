@@ -38,7 +38,7 @@ public class YMLDatabase implements MoneyUpdater {
         if (hasAccount(uuid)) {
             Map<String, Long> moneyMap = new HashMap<>();
             for (String economyID : this.economyIDs) {
-                long money = playerFileManager.get(uuid).getLong("economyID");
+                long money = playerFileManager.get(uuid).getLong(economyID);
                 moneyMap.put(economyID, money);
             }
             return new PlayerData(uuid, moneyMap);
