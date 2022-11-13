@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
-import java.util.List;
 
 public class UconomyPlaceholders extends PlaceholderExpansion {
     private final DecimalFormat df = new DecimalFormat("###,###");

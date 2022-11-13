@@ -14,7 +14,7 @@ public class PlayerData {
     public void afterDeposit(String economyID, long depositedMoney) {
         this.moneyMap.put(economyID, depositedMoney);
     }
-    public void afterWithdraw(String economyID, long withDrewMoney) {
-        this.moneyMap.put(economyID, withDrewMoney);
+    public void afterWithdraw(String economyID, long withdrewMoney) {
+        this.moneyMap.put(economyID, withdrewMoney);
     }
 }
