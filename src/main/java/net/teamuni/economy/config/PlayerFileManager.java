@@ -56,7 +56,6 @@ public class PlayerFileManager {
     }
 
     public void load(UUID uuid) {
-        if (main.isMySQLUse() | this.playerFileMap.containsKey(uuid)) return;
         File file = new File(dataFolder.getPath(), uuid.toString() + ".yml");
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
         this.playerFileMap.put(uuid, new PlayerFile(file, fileConfiguration));

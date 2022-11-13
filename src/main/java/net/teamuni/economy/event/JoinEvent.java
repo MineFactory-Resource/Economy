@@ -26,7 +26,9 @@ public class JoinEvent implements Listener {
             if (!moneyUpdater.hasAccount(playerUUID)) {
                 moneyUpdater.createPlayerAccount(player);
             }
-            main.getPlayerFileManager().load(playerUUID);
+            if (!main.isMySQLUse()) {
+                main.getPlayerFileManager().load(playerUUID);
+            }
             main.getPlayerDataManager().getCache(playerUUID);
         });
     }
