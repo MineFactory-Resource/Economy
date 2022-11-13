@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 public class UconomyPlaceholders extends PlaceholderExpansion {
     private final DecimalFormat df = new DecimalFormat("###,###");
@@ -35,9 +36,11 @@ public class UconomyPlaceholders extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        if (params.equalsIgnoreCase("balance")) {
-            PlayerData cacheIfPresent = main.getPlayerDataManager().getCacheIfPresent(player.getUniqueId());
-            return cacheIfPresent == null ? "0" : df.format(cacheIfPresent.getMoney());
+        for (String id : main.getConfig().getStringList("EconomyID")) {
+            if (params.equalsIgnoreCase("balance_" + id)) {
+                PlayerData cacheIfPresent = main.getPlayerDataManager().getCacheIfPresent(player.getUniqueId());
+                return cacheIfPresent == null ? "0" : df.format(cacheIfPresent.getMoneyMap().get(id));
+            }
         }
         if (params.equalsIgnoreCase("minimum_value")) {
             return df.format(main.getConfig().getLong("minimum_amount"));
