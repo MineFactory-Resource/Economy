@@ -8,16 +8,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.UUID;
 
-public class JoinEvent implements Listener {
+public class JoinAndQuit implements Listener {
     private final Uconomy main;
-    public JoinEvent(Uconomy instance) {
+    public JoinAndQuit(Uconomy instance) {
         this.main = instance;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
@@ -27,7 +28,13 @@ public class JoinEvent implements Listener {
             if (!moneyUpdater.hasAccount(playerUUID)) {
                 moneyUpdater.createPlayerAccount(player);
             }
+            main.getPlayerFileManager().load(playerUUID);
             main.getPlayerDataManager().getCache(playerUUID);
         });
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onQuit(PlayerQuitEvent event) {
+        main.getPlayerFileManager().remove(event.getPlayer().getUniqueId());
     }
 }
