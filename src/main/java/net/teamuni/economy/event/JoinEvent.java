@@ -5,16 +5,14 @@ import net.teamuni.economy.data.MoneyUpdater;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.UUID;
 
-public class JoinAndQuit implements Listener {
+public class JoinEvent implements Listener {
     private final Uconomy main;
-    public JoinAndQuit(Uconomy instance) {
+    public JoinEvent(Uconomy instance) {
         this.main = instance;
     }
 
@@ -31,10 +29,5 @@ public class JoinAndQuit implements Listener {
             main.getPlayerFileManager().load(playerUUID);
             main.getPlayerDataManager().getCache(playerUUID);
         });
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onQuit(PlayerQuitEvent event) {
-        main.getPlayerFileManager().remove(event.getPlayer().getUniqueId());
     }
 }
