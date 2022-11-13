@@ -39,6 +39,7 @@ public class MySQLDatabase implements MoneyUpdater {
 
         try {
             initTable();
+            updateColumn();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -59,24 +60,41 @@ public class MySQLDatabase implements MoneyUpdater {
         }
     }
 
+    private void updateColumn() throws SQLException {
+        try (Connection connection = this.sql.getConnection()) {
+            for (String economyID : this.economyIDs) {
+                try (Statement statement = connection.createStatement()) {
+                    String query = "ALTER TABLE uc_stats ADD COLUMN IF NOT EXISTS " + economyID + " BIGINT";
+                    statement.execute(query);
+                }
+            }
+        }
+    }
+
     @Override
     public void updatePlayerStats(PlayerData stats) {
         try {
-            Connection connection = this.sql.getConnection();
-            for (Map.Entry<String, Long> entry : stats.getMoneyMap().entrySet()) {
-                Statement statement = connection.createStatement();
-                StringBuilder query = new StringBuilder();
-                query.append("INSERT INTO uc_stats (uuid, ")
-                        .append(entry.getKey())
-                        .append(") VALUE (")
-                        .append(stats.getUuid())
-                        .append(", ")
-                        .append(entry.getValue())
-                        .append(") ON DUPLICATE KEY UPDATE money = ")
-                        .append(entry.getValue());
+            try (Connection connection = this.sql.getConnection()) {
+                StringBuilder query1 = new StringBuilder("INSERT INTO uc_stats (uuid, ");
+                StringBuilder query2 = new StringBuilder(") VALUE ('").append(stats.getUuid()).append("', ");
+                StringBuilder query3 = new StringBuilder(") ON DUPLICATE KEY UPDATE ");
+                for (Map.Entry<String, Long> entry : stats.getMoneyMap().entrySet()) {
+                    query1.append(entry.getKey())
+                            .append(", ");
+                    query2.append(entry.getValue())
+                            .append(", ");
+                    query3.append(entry.getKey())
+                            .append(" = ")
+                            .append(entry.getValue())
+                            .append(", ");
+                }
+                query1.deleteCharAt(query1.length() - 2);
+                query2.deleteCharAt(query2.length() - 2);
+                query3.deleteCharAt(query3.length() - 2);
+                StringBuilder finalQuery = query1.append(query2).append(query3);
 
-                try (connection; statement) {
-                    statement.executeUpdate(query.toString());
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate(finalQuery.toString());
                 }
             }
         } catch (SQLException e) {
@@ -87,25 +105,26 @@ public class MySQLDatabase implements MoneyUpdater {
     @Override
     public PlayerData loadPlayerStats(UUID uuid) {
         try {
-            Map<String, Long> map = new HashMap<>();
-            Connection connection = this.sql.getConnection();
+            try (Connection connection = this.sql.getConnection()) {
+                Map<String, Long> map = new HashMap<>();
 
-            for (String economyID : this.economyIDs) {
-                Statement statement = connection.createStatement();
-                StringBuilder query = new StringBuilder();
-                query.append("SELECT ")
-                        .append(economyID)
-                        .append(" FROM uc_stats WHERE uuid = ")
-                        .append(uuid.toString());
+                for (String economyID : this.economyIDs) {
+                    StringBuilder query = new StringBuilder();
+                    query.append("SELECT ")
+                            .append(economyID)
+                            .append(" FROM uc_stats WHERE uuid = '")
+                            .append(uuid.toString())
+                            .append("'");
 
-                try (connection; statement) {
-                    ResultSet result = statement.executeQuery(query.toString());
-                    if (result.next()) {
-                        map.put(economyID, result.getLong(1));
+                    try (Statement statement = connection.createStatement()) {
+                        ResultSet result = statement.executeQuery(query.toString());
+                        if (result.next()) {
+                            map.put(economyID, result.getLong(1));
+                        }
                     }
                 }
+                return new PlayerData(uuid, map);
             }
-            return new PlayerData(uuid, map);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -142,15 +161,24 @@ public class MySQLDatabase implements MoneyUpdater {
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
         try {
-            Connection connection = this.sql.getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO uc_stats (uuid, money) VALUE (?, ?)");
-            statement.setString(1, player.getUniqueId().toString());
-            statement.setLong(2, 0);
+            try (Connection connection = this.sql.getConnection()) {
+                StringBuilder query1 = new StringBuilder("INSERT INTO uc_stats (uuid, ");
+                StringBuilder query2 = new StringBuilder(") VALUE ('").append(player.getUniqueId()).append("', ");
+                for (String economyID : this.economyIDs) {
+                    query1.append(economyID)
+                            .append(", ");
+                    query2.append(0)
+                            .append(", ");
+                }
+                query1.deleteCharAt(query1.length() - 2);
+                query2.deleteCharAt(query2.length() - 2);
+                StringBuilder finalQuery = query1.append(query2).append(")");
 
-            try (connection; statement) {
-                statement.executeUpdate();
-                Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
-                return true;
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate(finalQuery.toString());
+                    Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
+                    return true;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
