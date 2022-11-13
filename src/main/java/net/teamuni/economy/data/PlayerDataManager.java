@@ -34,7 +34,7 @@ public class PlayerDataManager implements Listener {
                     public @NotNull PlayerData load(@NotNull UUID uuid) {
                         MoneyUpdater updater = instance.getMoneyUpdater();
                         if (updater == null) {
-                            return new PlayerData(uuid.toString(), 0);
+                            return new PlayerData(uuid, null);
                         }
                         return updater.loadPlayerStats(uuid);
                     }

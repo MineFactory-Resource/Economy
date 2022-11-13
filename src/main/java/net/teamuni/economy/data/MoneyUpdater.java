@@ -7,6 +7,7 @@ import java.util.UUID;
 public interface MoneyUpdater {
     void updatePlayerStats(PlayerData playerData);
     PlayerData loadPlayerStats(UUID uuid);
+    PlayerData defaultPlayerStats(UUID uuid);
     boolean hasAccount(UUID uuid);
     boolean createPlayerAccount(OfflinePlayer player);
 }
