@@ -48,7 +48,6 @@ public class YMLDatabase implements MoneyUpdater {
 
     @Override
     public PlayerData defaultPlayerStats(UUID uuid) {
-        Uconomy main = Uconomy.getPlugin(Uconomy.class);
         Map<String, Long> map = new HashMap<>();
         for (String money : main.getConfig().getStringList("EconomyID")) {
             map.put(money, 0L);

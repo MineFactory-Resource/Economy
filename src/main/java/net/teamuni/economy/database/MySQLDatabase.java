@@ -62,10 +62,14 @@ public class MySQLDatabase implements MoneyUpdater {
 
     private void updateColumn() throws SQLException {
         try (Connection connection = this.sql.getConnection()) {
+            StringBuilder query = new StringBuilder();
             for (String economyID : this.economyIDs) {
                 try (Statement statement = connection.createStatement()) {
-                    String query = "ALTER TABLE uc_stats ADD COLUMN IF NOT EXISTS " + economyID + " BIGINT";
-                    statement.execute(query);
+                    query.append("ALTER TABLE uc_stats ADD COLUMN IF NOT EXISTS ")
+                            .append(economyID)
+                            .append(" BIGINT");
+                    statement.execute(query.toString());
+                    query.setLength(0);
                 }
             }
         }
@@ -88,9 +92,9 @@ public class MySQLDatabase implements MoneyUpdater {
                             .append(entry.getValue())
                             .append(", ");
                 }
-                query1.deleteCharAt(query1.length() - 2);
-                query2.deleteCharAt(query2.length() - 2);
-                query3.deleteCharAt(query3.length() - 2);
+                query1.delete(query1.length() - 2, query1.length());
+                query2.delete(query2.length() - 2, query2.length());
+                query3.delete(query3.length() - 2, query3.length());
                 StringBuilder finalQuery = query1.append(query2).append(query3);
 
                 try (Statement statement = connection.createStatement()) {
@@ -107,9 +111,9 @@ public class MySQLDatabase implements MoneyUpdater {
         try {
             try (Connection connection = this.sql.getConnection()) {
                 Map<String, Long> map = new HashMap<>();
+                StringBuilder query = new StringBuilder();
 
                 for (String economyID : this.economyIDs) {
-                    StringBuilder query = new StringBuilder();
                     query.append("SELECT ")
                             .append(economyID)
                             .append(" FROM uc_stats WHERE uuid = '")
@@ -118,6 +122,7 @@ public class MySQLDatabase implements MoneyUpdater {
 
                     try (Statement statement = connection.createStatement()) {
                         ResultSet result = statement.executeQuery(query.toString());
+                        query.setLength(0);
                         if (result.next()) {
                             map.put(economyID, result.getLong(1));
                         }
@@ -169,8 +174,8 @@ public class MySQLDatabase implements MoneyUpdater {
                     query2.append(0)
                             .append(", ");
                 }
-                query1.deleteCharAt(query1.length() - 2);
-                query2.deleteCharAt(query2.length() - 2);
+                query1.delete(query1.length() - 2, query1.length());
+                query2.delete(query2.length() - 2, query2.length());
                 StringBuilder finalQuery = query1.append(query2).append(")");
 
                 try (Statement statement = connection.createStatement()) {
