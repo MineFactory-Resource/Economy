@@ -21,9 +21,9 @@ import java.util.UUID;
 public class MySQLDatabase implements MoneyUpdater {
     private final HikariDataSource sql;
     private final List<String> economyIDs;
+    private final Uconomy main = Uconomy.getPlugin(Uconomy.class);
 
     public MySQLDatabase(String host, int port, String database, String parameters, String user, String password) {
-        Uconomy main = Uconomy.getPlugin(Uconomy.class);
         HikariConfig config = new HikariConfig();
         config.setUsername(user);
         config.setPassword(password);
@@ -133,7 +133,6 @@ public class MySQLDatabase implements MoneyUpdater {
 
     @Override
     public PlayerData defaultPlayerStats(UUID uuid) {
-        Uconomy main = Uconomy.getPlugin(Uconomy.class);
         Map<String, Long> map = new HashMap<>();
         for (String money : main.getConfig().getStringList("EconomyID")) {
             map.put(money, 0L);
