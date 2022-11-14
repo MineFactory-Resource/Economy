@@ -1,3 +1,6 @@
+#재화 종류
+EconomyID:
+  - "game"
 # 돈 보내기 기능의 최소 금액
 minimum_amount: 1
 #MySQL 사용 여부

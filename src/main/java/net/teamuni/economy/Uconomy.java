@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.teamuni.economy.command.CommandTabCompleter;
 import net.teamuni.economy.command.UconomyCmd;
 import net.teamuni.economy.config.MessageManager;
+import net.teamuni.economy.config.PlayerFileManager;
 import net.teamuni.economy.data.MoneyManager;
 import net.teamuni.economy.data.MoneyUpdater;
 import net.teamuni.economy.data.PlayerDataManager;
@@ -22,6 +23,7 @@ public final class Uconomy extends JavaPlugin {
     private MoneyManager moneyManager;
     private MoneyUpdater moneyUpdater;
     private PlayerDataManager playerDataManager;
+    private PlayerFileManager playerFileManager;
     private boolean isMySQLUse = false;
 
     @Override
@@ -29,7 +31,6 @@ public final class Uconomy extends JavaPlugin {
         this.messageManager = new MessageManager(this);
         this.moneyManager = new MoneyManager(this);
         this.messageManager.createMessagesYml();
-        this.moneyManager.createMoneyDataYml();
         saveDefaultConfig();
         this.isMySQLUse = Boolean.parseBoolean(getConfig().getString("mysql_use"));
         if (isMySQLUse) {
@@ -43,6 +44,7 @@ public final class Uconomy extends JavaPlugin {
                 this.moneyUpdater = null;
             }
         } else {
+            this.playerFileManager = new PlayerFileManager(this);
             this.moneyUpdater = new YMLDatabase(this);
         }
         this.playerDataManager = new PlayerDataManager(this);
@@ -50,8 +52,8 @@ public final class Uconomy extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new JoinEvent(this), this);
         getCommand("돈").setExecutor(new UconomyCmd(this));
         getCommand("uconomy").setExecutor(new UconomyCmd(this));
-        getCommand("돈").setTabCompleter(new CommandTabCompleter());
-        getCommand("uconomy").setTabCompleter(new CommandTabCompleter());
+        getCommand("돈").setTabCompleter(new CommandTabCompleter(this));
+        getCommand("uconomy").setTabCompleter(new CommandTabCompleter(this));
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new UconomyPlaceholders().register();
         }
@@ -60,8 +62,5 @@ public final class Uconomy extends JavaPlugin {
     @Override
     public void onDisable() {
         this.playerDataManager.removeAll();
-        if (!isMySQLUse) {
-            this.moneyManager.save();
-        }
     }
 }

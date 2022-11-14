@@ -5,7 +5,6 @@ import net.teamuni.economy.data.MoneyUpdater;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -17,7 +16,7 @@ public class JoinEvent implements Listener {
         this.main = instance;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
@@ -26,6 +25,9 @@ public class JoinEvent implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(main, () -> {
             if (!moneyUpdater.hasAccount(playerUUID)) {
                 moneyUpdater.createPlayerAccount(player);
+            }
+            if (!main.isMySQLUse()) {
+                main.getPlayerFileManager().load(playerUUID);
             }
             main.getPlayerDataManager().getCache(playerUUID);
         });

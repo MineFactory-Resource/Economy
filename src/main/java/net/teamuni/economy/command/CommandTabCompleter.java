@@ -1,5 +1,6 @@
 package net.teamuni.economy.command;
 
+import net.teamuni.economy.Uconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -12,6 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandTabCompleter implements TabCompleter {
+    private final List<String> economyIDs = new ArrayList<>();
+    public CommandTabCompleter(Uconomy instance) {
+        this.economyIDs.addAll(instance.getConfig().getStringList("EconomyID"));
+    }
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
@@ -47,6 +52,8 @@ public class CommandTabCompleter implements TabCompleter {
                         tabCompleteMessage.add(onlinePlayers.getName());
                     }
                 } else if (args.length == 3) {
+                    tabCompleteMessage.addAll(economyIDs);
+                } else if (args.length == 4) {
                     tabCompleteMessage.add("금액");
                 }
                 return tabCompleteMessage;
@@ -58,6 +65,8 @@ public class CommandTabCompleter implements TabCompleter {
                             tabCompleteMessage.add(onlinePlayers.getName());
                         }
                     } else if (args.length == 3) {
+                        tabCompleteMessage.addAll(economyIDs);
+                    } else if (args.length == 4) {
                         tabCompleteMessage.add("금액");
                     }
                 }
