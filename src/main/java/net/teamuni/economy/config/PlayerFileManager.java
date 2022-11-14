@@ -38,8 +38,8 @@ public class PlayerFileManager {
             }
         }
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
-        for (String money : main.getConfig().getStringList("EconomyID")) {
-            fileConfiguration.set(money, 0);
+        for (String economyID : main.getConfig().getStringList("EconomyID")) {
+            fileConfiguration.set(economyID, 0);
         }
         this.playerFileMap.put(uuid, new PlayerFile(file, fileConfiguration));
     }

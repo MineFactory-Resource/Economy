@@ -139,8 +139,8 @@ public class MySQLDatabase implements MoneyUpdater {
     @Override
     public PlayerData defaultPlayerStats(UUID uuid) {
         Map<String, Long> map = new HashMap<>();
-        for (String money : main.getConfig().getStringList("EconomyID")) {
-            map.put(money, 0L);
+        for (String economyID : this.economyIDs) {
+            map.put(economyID, 0L);
         }
         return new PlayerData(uuid, map);
     }

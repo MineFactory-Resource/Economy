@@ -35,10 +35,10 @@ public class UconomyPlaceholders extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        for (String id : main.getConfig().getStringList("EconomyID")) {
-            if (params.equalsIgnoreCase("balance_" + id)) {
+        for (String economyID : main.getConfig().getStringList("EconomyID")) {
+            if (params.equalsIgnoreCase("balance_" + economyID)) {
                 PlayerData cacheIfPresent = main.getPlayerDataManager().getCacheIfPresent(player.getUniqueId());
-                return cacheIfPresent == null ? "0" : df.format(cacheIfPresent.getMoneyMap().get(id));
+                return cacheIfPresent == null ? "0" : df.format(cacheIfPresent.getMoneyMap().get(economyID));
             }
         }
         if (params.equalsIgnoreCase("minimum_value")) {

@@ -27,9 +27,9 @@ public class YMLDatabase implements MoneyUpdater {
     @Override
     public void updatePlayerStats(PlayerData stats) {
         for (Map.Entry<String, Long> entry : stats.getMoneyMap().entrySet()) {
-            playerFileManager.get(stats.getUuid()).set(entry.getKey(), entry.getValue());
+            this.playerFileManager.get(stats.getUuid()).set(entry.getKey(), entry.getValue());
         }
-        playerFileManager.save(stats.getUuid());
+        this.playerFileManager.save(stats.getUuid());
         main.getPlayerFileManager().remove(stats.getUuid());
     }
 
@@ -38,7 +38,7 @@ public class YMLDatabase implements MoneyUpdater {
         if (hasAccount(uuid)) {
             Map<String, Long> moneyMap = new HashMap<>();
             for (String economyID : this.economyIDs) {
-                long money = playerFileManager.get(uuid).getLong(economyID);
+                long money = this.playerFileManager.get(uuid).getLong(economyID);
                 moneyMap.put(economyID, money);
             }
             return new PlayerData(uuid, moneyMap);
@@ -49,20 +49,20 @@ public class YMLDatabase implements MoneyUpdater {
     @Override
     public PlayerData defaultPlayerStats(UUID uuid) {
         Map<String, Long> map = new HashMap<>();
-        for (String money : main.getConfig().getStringList("EconomyID")) {
-            map.put(money, 0L);
+        for (String economyID : this.economyIDs) {
+            map.put(economyID, 0L);
         }
         return new PlayerData(uuid, map);
     }
 
     @Override
     public boolean hasAccount(UUID uuid) {
-        return playerFileManager.isExist(uuid);
+        return this.playerFileManager.isExist(uuid);
     }
 
     @Override
     public boolean createPlayerAccount(OfflinePlayer player) {
-        playerFileManager.createPlayerFile(player.getUniqueId());
+        this.playerFileManager.createPlayerFile(player.getUniqueId());
         Bukkit.getLogger().info("[Uconomy] " + player.getName() + "님의 돈 정보를 생성하였습니다.");
         return true;
     }
