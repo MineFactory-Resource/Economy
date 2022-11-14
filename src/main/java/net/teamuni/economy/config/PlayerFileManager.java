@@ -29,7 +29,7 @@ public class PlayerFileManager {
     }
 
     public void createPlayerFile(UUID uuid) {
-        File file = new File(dataFolder.getPath(), uuid.toString() + ".yml");
+        File file = new File(this.dataFolder.getPath(), uuid.toString() + ".yml");
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -56,7 +56,7 @@ public class PlayerFileManager {
     }
 
     public void load(UUID uuid) {
-        File file = new File(dataFolder.getPath(), uuid.toString() + ".yml");
+        File file = new File(this.dataFolder.getPath(), uuid.toString() + ".yml");
         FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(file);
         this.playerFileMap.put(uuid, new PlayerFile(file, fileConfiguration));
     }
@@ -70,7 +70,7 @@ public class PlayerFileManager {
     }
 
     public boolean isExist(UUID uuid) {
-        File file = new File(dataFolder.getPath(), uuid.toString() + ".yml");
+        File file = new File(this.dataFolder.getPath(), uuid.toString() + ".yml");
         return file.exists();
     }
 }
