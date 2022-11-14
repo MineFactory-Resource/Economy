@@ -109,26 +109,28 @@ public class MySQLDatabase implements MoneyUpdater {
     @Override
     public PlayerData loadPlayerStats(UUID uuid) {
         try {
-            try (Connection connection = this.sql.getConnection()) {
-                Map<String, Long> map = new HashMap<>();
-                StringBuilder query = new StringBuilder();
+            if (hasAccount(uuid)) {
+                try (Connection connection = this.sql.getConnection()) {
+                    Map<String, Long> map = new HashMap<>();
+                    StringBuilder query = new StringBuilder();
 
-                for (String economyID : this.economyIDs) {
-                    query.append("SELECT ")
-                            .append(economyID)
-                            .append(" FROM uc_stats WHERE uuid = '")
-                            .append(uuid.toString())
-                            .append("'");
+                    for (String economyID : this.economyIDs) {
+                        query.append("SELECT ")
+                                .append(economyID)
+                                .append(" FROM uc_stats WHERE uuid = '")
+                                .append(uuid.toString())
+                                .append("'");
 
-                    try (Statement statement = connection.createStatement()) {
-                        ResultSet result = statement.executeQuery(query.toString());
-                        query.setLength(0);
-                        if (result.next()) {
-                            map.put(economyID, result.getLong(1));
+                        try (Statement statement = connection.createStatement()) {
+                            ResultSet result = statement.executeQuery(query.toString());
+                            query.setLength(0);
+                            if (result.next()) {
+                                map.put(economyID, result.getLong(1));
+                            }
                         }
                     }
+                    return new PlayerData(uuid, map);
                 }
-                return new PlayerData(uuid, map);
             }
         } catch (SQLException e) {
             e.printStackTrace();
