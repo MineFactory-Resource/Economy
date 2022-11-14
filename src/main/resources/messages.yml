@@ -52,10 +52,7 @@ Messages:
     #economyID 자리에는 config.yml에 설정한 EconomyID를 넣어주세요.
   check_my_money: #자신의 돈을 확인할 때 출력되는 메시지입니다.
     - ""
-    - "&fCS:GO : &a%player_money_csgo%&f원"
-    - "&fValorant : &a%player_money_valorant%&f원"
-    - "&fLostArk : &a%player_money_lostark%&f원"
-    - "&fOverwatch : &a%player_money_overwatch%&f원"
+    - "&fGame : &a%player_money_game%&f원"
     - ""
 
     #플레이어의 닉네임 가져오기: %name_of_player%
@@ -64,10 +61,7 @@ Messages:
   check_the_other_player_money: #다른 플레이어의 돈을 확인할 때 출력되는 메시지입니다.
     - ""
     - "&d%name_of_player%&f님이 보유하고 있는 돈은 아래와 같습니다."
-    - "&fCS:GO : &a%player_money_csgo%&f원"
-    - "&fValorant : &a%player_money_valorant%&f원"
-    - "&fLostArk : &a%player_money_lostark%&f원"
-    - "&fOverwatch : &a%player_money_overwatch%&f원"
+    - "&fGame : &a%player_money_game%&f원"
     - ""
 
     #돈을 받은 플레이어의 닉네임 가져오기: %name_of_recipient%
