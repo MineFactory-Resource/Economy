@@ -21,9 +21,9 @@ import java.util.UUID;
 public class MySQLDatabase implements MoneyUpdater {
     private final HikariDataSource sql;
     private final List<String> economyIDs;
-    private final Uconomy main = Uconomy.getPlugin(Uconomy.class);
 
     public MySQLDatabase(String host, int port, String database, String parameters, String user, String password) {
+        Uconomy main = Uconomy.getPlugin(Uconomy.class);
         HikariConfig config = new HikariConfig();
         config.setUsername(user);
         config.setPassword(password);
