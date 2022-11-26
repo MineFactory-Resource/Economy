@@ -90,8 +90,8 @@ public class UconomyCmd implements CommandExecutor {
                                         , "%value_of_minimum%", df.format(main.getConfig().getLong("minimum_amount")));
                                 return false;
                             }
-                            main.getMoneyManager().withdrawPlayer(player, args[2], Long.parseLong(args[3]));
-                            main.getMoneyManager().depositPlayer(recipient, args[2], Long.parseLong(args[3]));
+                            main.getMoneyManager().withdraw(player, args[2], Long.parseLong(args[3]));
+                            main.getMoneyManager().deposit(recipient, args[2], Long.parseLong(args[3]));
 
                             main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("transaction_confirm_to_sender")
                                     , "%economy_id%" , args[2]
@@ -137,7 +137,7 @@ public class UconomyCmd implements CommandExecutor {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("지급")) {
-                                main.getMoneyManager().depositPlayer(target, args[2], Long.parseLong(args[3]));
+                                main.getMoneyManager().deposit(target, args[2], Long.parseLong(args[3]));
 
                                 main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("increase_player_money")
                                         , "%economy_id%" , args[2]
@@ -146,10 +146,10 @@ public class UconomyCmd implements CommandExecutor {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("차감")) {
-                                main.getMoneyManager().withdrawPlayer(target, args[2], Long.parseLong(args[3]));
+                                main.getMoneyManager().withdraw(target, args[2], Long.parseLong(args[3]));
 
                                 if (main.getMoneyManager().getBalance(target, args[2]) < 0) {
-                                    main.getMoneyManager().depositPlayer(target, args[2], main.getMoneyManager().getBalance(target, args[2]) * -1);
+                                    main.getMoneyManager().set(target, args[2], 0);
                                 }
                                 main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("decrease_player_money")
                                         , "%economy_id%" , args[2]
@@ -158,8 +158,7 @@ public class UconomyCmd implements CommandExecutor {
                                 return false;
                             }
                             if (args[0].equalsIgnoreCase("설정")) {
-                                main.getMoneyManager().withdrawPlayer(target, args[2], main.getMoneyManager().getBalance(target, args[2]));
-                                main.getMoneyManager().depositPlayer(target, args[2], Long.parseLong(args[3]));
+                                main.getMoneyManager().set(target, args[2], Long.parseLong(args[3]));
 
                                 main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("set_player_money")
                                         , "%economy_id%" , args[2]

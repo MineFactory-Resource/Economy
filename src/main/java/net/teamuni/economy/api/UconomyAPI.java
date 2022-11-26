@@ -25,33 +25,29 @@ public class UconomyAPI {
 
     public static void withdraw(UUID uuid, String economyID, long amount) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        getInstance().getMoneyManager().withdrawPlayer(player, economyID, amount);
+        getInstance().getMoneyManager().withdraw(player, economyID, amount);
     }
 
     public static void withdraw(@NotNull OfflinePlayer player, String economyID, long amount) {
-        getInstance().getMoneyManager().withdrawPlayer(player, economyID, amount);
+        getInstance().getMoneyManager().withdraw(player, economyID, amount);
     }
 
     public static void deposit(UUID uuid, String economyID, long amount) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        getInstance().getMoneyManager().depositPlayer(player, economyID, amount);
+        getInstance().getMoneyManager().deposit(player, economyID, amount);
     }
 
     public static void deposit(@NotNull OfflinePlayer player, String economyID, long amount) {
-        getInstance().getMoneyManager().depositPlayer(player, economyID, amount);
+        getInstance().getMoneyManager().deposit(player, economyID, amount);
     }
 
     public static void setBalance(UUID uuid, String economyID, long amount) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-        long money = getInstance().getPlayerDataManager().getCache(uuid).getMoneyMap().get(economyID);
-        getInstance().getMoneyManager().withdrawPlayer(player, economyID, money);
-        getInstance().getMoneyManager().depositPlayer(player, economyID, amount);
+        getInstance().getMoneyManager().set(player, economyID, amount);
     }
 
     public static void setBalance(@NotNull OfflinePlayer player, String economyID, long amount) {
-        long money = getInstance().getPlayerDataManager().getCache(player.getUniqueId()).getMoneyMap().get(economyID);
-        getInstance().getMoneyManager().withdrawPlayer(player, economyID, money);
-        getInstance().getMoneyManager().depositPlayer(player, economyID, amount);
+        getInstance().getMoneyManager().set(player, economyID, amount);
     }
 
     public static boolean has(UUID uuid, String economyID, long amount) {

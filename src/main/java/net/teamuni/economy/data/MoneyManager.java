@@ -39,13 +39,17 @@ public class MoneyManager {
         return getBalance(player, economyID) >= amount;
     }
 
-    public void withdrawPlayer(OfflinePlayer player, String economyID, long amount) {
+    public void withdraw(OfflinePlayer player, String economyID, long amount) {
         long withdrewMoney = getBalance(player, economyID) - amount;
-        main.getPlayerDataManager().getCache(player.getUniqueId()).afterWithdraw(economyID, withdrewMoney);
+        main.getPlayerDataManager().getCache(player.getUniqueId()).set(economyID, withdrewMoney);
     }
 
-    public void depositPlayer(OfflinePlayer player, String economyID, long amount) {
+    public void deposit(OfflinePlayer player, String economyID, long amount) {
         long depositedMoney = getBalance(player, economyID) + amount;
-        main.getPlayerDataManager().getCache(player.getUniqueId()).afterDeposit(economyID, depositedMoney);
+        main.getPlayerDataManager().getCache(player.getUniqueId()).set(economyID, depositedMoney);
+    }
+
+    public void set(OfflinePlayer player, String economyID, long amount) {
+        main.getPlayerDataManager().getCache(player.getUniqueId()).set(economyID, amount);
     }
 }

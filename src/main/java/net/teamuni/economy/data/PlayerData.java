@@ -11,10 +11,7 @@ import java.util.UUID;
 public class PlayerData {
     private final UUID uuid;
     private Map<String, Long> moneyMap;
-    public void afterDeposit(String economyID, long depositedMoney) {
-        this.moneyMap.put(economyID, depositedMoney);
-    }
-    public void afterWithdraw(String economyID, long withdrewMoney) {
-        this.moneyMap.put(economyID, withdrewMoney);
+    public void set(String economyID, long value) {
+        this.moneyMap.put(economyID, value);
     }
 }
