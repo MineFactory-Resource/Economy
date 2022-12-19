@@ -33,8 +33,7 @@ public class UconomyCmd implements CommandExecutor {
                     switch (args[0]) {
                         case "확인":
                             switch (args.length) {
-                                case 1 ->
-                                        main.getMessageManager().sendPlayerMoneyInfo(player);
+                                case 1 -> main.getMessageManager().sendPlayerMoneyInfo(player);
                                 case 2 -> {
                                     if (!player.hasPermission("ucon.manage")) {
                                         main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("not_available_command"));
@@ -94,7 +93,7 @@ public class UconomyCmd implements CommandExecutor {
                             main.getMoneyManager().deposit(recipient, args[2], Long.parseLong(args[3]));
 
                             main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("transaction_confirm_to_sender")
-                                    , "%economy_id%" , args[2]
+                                    , "%economy_id%", args[2]
                                     , "%name_of_recipient%", recipient.getName()
                                     , "%sent_money%", df.format(Long.parseLong(args[3]))
                                     , "%sender_money_after_transaction%", df.format(main.getMoneyManager().getBalance(player, args[2])));
@@ -103,7 +102,7 @@ public class UconomyCmd implements CommandExecutor {
                                 Player onlineRecipient = recipient.getPlayer();
                                 assert onlineRecipient != null;
                                 main.getMessageManager().sendTranslatedMessage(onlineRecipient, this.messageListMap.get("transaction_confirm_to_recipient")
-                                        , "%economy_id%" , args[2]
+                                        , "%economy_id%", args[2]
                                         , "%name_of_sender%", player.getName()
                                         , "%received_money%", df.format(Long.parseLong(args[3]))
                                         , "%recipient_money_after_transaction%", df.format(main.getMoneyManager().getBalance(recipient, args[2])));
@@ -140,7 +139,7 @@ public class UconomyCmd implements CommandExecutor {
                                 main.getMoneyManager().deposit(target, args[2], Long.parseLong(args[3]));
 
                                 main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("increase_player_money")
-                                        , "%economy_id%" , args[2]
+                                        , "%economy_id%", args[2]
                                         , "%name_of_player%", target.getName()
                                         , "%increased_money%", df.format(Long.parseLong(args[3])));
                                 return false;
@@ -152,7 +151,7 @@ public class UconomyCmd implements CommandExecutor {
                                     main.getMoneyManager().set(target, args[2], 0);
                                 }
                                 main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("decrease_player_money")
-                                        , "%economy_id%" , args[2]
+                                        , "%economy_id%", args[2]
                                         , "%name_of_player%", target.getName()
                                         , "%decreased_money%", df.format(Long.parseLong(args[3])));
                                 return false;
@@ -161,7 +160,7 @@ public class UconomyCmd implements CommandExecutor {
                                 main.getMoneyManager().set(target, args[2], Long.parseLong(args[3]));
 
                                 main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("set_player_money")
-                                        , "%economy_id%" , args[2]
+                                        , "%economy_id%", args[2]
                                         , "%name_of_player%", target.getName()
                                         , "%set_money%", df.format(Long.parseLong(args[3])));
                                 return false;
@@ -179,12 +178,14 @@ public class UconomyCmd implements CommandExecutor {
                     }
                 }
                 return false;
-            }
-            if (command.getName().equalsIgnoreCase("uconomy") && args[0].equalsIgnoreCase("reload") && player.hasPermission("ucon.reload")) {
-                main.reloadConfig();
-                main.getMessageManager().reload();
-                this.messageListMap.putAll(main.getMessageManager().getMessages());
-                main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("reload_message"));
+            } else if (command.getName().equalsIgnoreCase("uconomy")) {
+                if (args.length > 0 && args[0].equalsIgnoreCase("reload")
+                        && player.hasPermission("ucon.reload")) {
+                    main.reloadConfig();
+                    main.getMessageManager().reload();
+                    this.messageListMap.putAll(main.getMessageManager().getMessages());
+                    main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("reload_message"));
+                }
             }
             return false;
         }
