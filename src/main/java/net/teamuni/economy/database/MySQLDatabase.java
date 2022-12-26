@@ -48,7 +48,7 @@ public class MySQLDatabase implements MoneyUpdater {
     private void initTable() throws SQLException {
         try (Connection connection = this.sql.getConnection()) {
             try (Statement statement = connection.createStatement()) {
-                StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS uc_stats(uuid varchar(36) primary key");
+                StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS uconomy(uuid varchar(36) primary key");
                 for (String economyID : this.economyIDs) {
                     query.append(", ")
                             .append(economyID)
@@ -65,7 +65,7 @@ public class MySQLDatabase implements MoneyUpdater {
             StringBuilder query = new StringBuilder();
             for (String economyID : this.economyIDs) {
                 try (Statement statement = connection.createStatement()) {
-                    query.append("ALTER TABLE uc_stats ADD COLUMN IF NOT EXISTS ")
+                    query.append("ALTER TABLE uconomy ADD COLUMN IF NOT EXISTS ")
                             .append(economyID)
                             .append(" BIGINT");
                     statement.execute(query.toString());
@@ -79,7 +79,7 @@ public class MySQLDatabase implements MoneyUpdater {
     public void updatePlayerStats(PlayerData stats) {
         try {
             try (Connection connection = this.sql.getConnection()) {
-                StringBuilder query1 = new StringBuilder("INSERT INTO uc_stats (uuid, ");
+                StringBuilder query1 = new StringBuilder("INSERT INTO uconomy (uuid, ");
                 StringBuilder query2 = new StringBuilder(") VALUE ('").append(stats.getUuid()).append("', ");
                 StringBuilder query3 = new StringBuilder(") ON DUPLICATE KEY UPDATE ");
                 for (Map.Entry<String, Long> entry : stats.getMoneyMap().entrySet()) {
@@ -117,7 +117,7 @@ public class MySQLDatabase implements MoneyUpdater {
                     for (String economyID : this.economyIDs) {
                         query.append("SELECT ")
                                 .append(economyID)
-                                .append(" FROM uc_stats WHERE uuid = '")
+                                .append(" FROM uconomy WHERE uuid = '")
                                 .append(uuid.toString())
                                 .append("'");
 
@@ -151,7 +151,7 @@ public class MySQLDatabase implements MoneyUpdater {
     public boolean hasAccount(UUID uuid) {
         try {
             Connection connection = this.sql.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM uc_stats WHERE uuid = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM uconomy WHERE uuid = ?");
             statement.setString(1, uuid.toString());
 
             try (connection; statement) {
@@ -168,7 +168,7 @@ public class MySQLDatabase implements MoneyUpdater {
     public boolean createPlayerAccount(OfflinePlayer player) {
         try {
             try (Connection connection = this.sql.getConnection()) {
-                StringBuilder query1 = new StringBuilder("INSERT INTO uc_stats (uuid, ");
+                StringBuilder query1 = new StringBuilder("INSERT INTO uconomy (uuid, ");
                 StringBuilder query2 = new StringBuilder(") VALUE ('").append(player.getUniqueId()).append("', ");
                 for (String economyID : this.economyIDs) {
                     query1.append(economyID)
