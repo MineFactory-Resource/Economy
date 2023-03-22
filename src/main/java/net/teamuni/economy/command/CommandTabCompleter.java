@@ -25,62 +25,55 @@ public class CommandTabCompleter implements TabCompleter {
         if (command.getName().equalsIgnoreCase("돈")) {
             List<String> tabCompleteMessage = new ArrayList<>();
 
-            if (args.length == 1) {
-                if (player.hasPermission("ucon.manage")) {
-                    tabCompleteMessage.add("확인");
-                    tabCompleteMessage.add("보내기");
-                    tabCompleteMessage.add("지급");
-                    tabCompleteMessage.add("차감");
-                    tabCompleteMessage.add("설정");
-                } else {
-                    tabCompleteMessage.add("확인");
-                    tabCompleteMessage.add("보내기");
-                }
-                return tabCompleteMessage;
-
-            } else if (args[0].equalsIgnoreCase("확인") && player.hasPermission("ucon.manage")) {
-                if (args.length == 2) {
-                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                        tabCompleteMessage.add(onlinePlayers.getName());
+            switch (args.length) {
+                case 1 -> {
+                    if (player.hasPermission("ucon.manage")) {
+                        tabCompleteMessage.add("확인");
+                        tabCompleteMessage.add("보내기");
+                        tabCompleteMessage.add("지급");
+                        tabCompleteMessage.add("차감");
+                        tabCompleteMessage.add("설정");
+                        tabCompleteMessage.add("리로드");
+                    } else {
+                        tabCompleteMessage.add("확인");
+                        tabCompleteMessage.add("보내기");
                     }
+                    return tabCompleteMessage;
                 }
-                return tabCompleteMessage;
-
-            } else if (args[0].equalsIgnoreCase("보내기")) {
-                if (args.length == 2) {
-                    for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                        tabCompleteMessage.add(onlinePlayers.getName());
-                    }
-                } else if (args.length == 3) {
-                    tabCompleteMessage.addAll(economyIDs);
-                } else if (args.length == 4) {
-                    tabCompleteMessage.add("금액");
-                }
-                return tabCompleteMessage;
-
-            } else if (args[0].equalsIgnoreCase("지급") || args[0].equalsIgnoreCase("차감") || args[0].equalsIgnoreCase("설정")) {
-                if (player.hasPermission("ucon.manage")) {
-                    if (args.length == 2) {
+                case 2 -> {
+                    if (args[0].equalsIgnoreCase("확인")
+                            && player.hasPermission("ucon.manage")
+                            || isCommand(args[0])) {
                         for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
                             tabCompleteMessage.add(onlinePlayers.getName());
                         }
-                    } else if (args.length == 3) {
-                        tabCompleteMessage.addAll(economyIDs);
-                    } else if (args.length == 4) {
-                        tabCompleteMessage.add("금액");
+                        return tabCompleteMessage;
                     }
                 }
-                return tabCompleteMessage;
+                case 3 -> {
+                    if (isCommand(args[0])) {
+                        tabCompleteMessage.addAll(economyIDs);
+                    }
+                    return tabCompleteMessage;
+                }
+                case 4 -> {
+                    if (isCommand(args[0])) {
+                        tabCompleteMessage.add("금액");
+                    }
+                    return tabCompleteMessage;
+                }
+                default -> {
+                    return null;
+                }
             }
-
-        } else if (command.getName().equalsIgnoreCase("uconomy")) {
-            List<String> tabCompleteMessage = new ArrayList<>();
-
-            if (args.length == 1) {
-                tabCompleteMessage.add("reload");
-            }
-            return tabCompleteMessage;
         }
         return null;
+    }
+
+    private boolean isCommand(String command) {
+        return command.equalsIgnoreCase("보내기")
+                || command.equalsIgnoreCase("지급")
+                || command.equalsIgnoreCase("차감")
+                || command.equalsIgnoreCase("설정");
     }
 }
