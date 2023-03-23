@@ -41,12 +41,10 @@ public class CommandTabCompleter implements TabCompleter {
                     return tabCompleteMessage;
                 }
                 case 2 -> {
-                    if (args[0].equalsIgnoreCase("확인")
-                            && player.hasPermission("ucon.manage")
-                            || isCommand(args[0])) {
-                        for (Player onlinePlayers : Bukkit.getOnlinePlayers()) {
-                            tabCompleteMessage.add(onlinePlayers.getName());
-                        }
+                    if (isCommand(args[0])
+                            || args[0].equalsIgnoreCase("확인")
+                            && player.hasPermission("ucon.manage")) {
+                        Bukkit.getOnlinePlayers().forEach(p -> tabCompleteMessage.add(p.getName()));
                         return tabCompleteMessage;
                     }
                 }
@@ -66,6 +64,7 @@ public class CommandTabCompleter implements TabCompleter {
                     return null;
                 }
             }
+            return null;
         }
         return null;
     }
