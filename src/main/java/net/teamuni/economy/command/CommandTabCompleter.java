@@ -41,7 +41,8 @@ public class CommandTabCompleter implements TabCompleter {
                     return tabCompleteMessage;
                 }
                 case 2 -> {
-                    if (isCommand(args[0])
+                    if (isOpCommand(player, args[0])
+                            || args[0].equalsIgnoreCase("보내기")
                             || args[0].equalsIgnoreCase("확인")
                             && player.hasPermission("ucon.manage")) {
                         Bukkit.getOnlinePlayers().forEach(p -> tabCompleteMessage.add(p.getName()));
@@ -49,13 +50,15 @@ public class CommandTabCompleter implements TabCompleter {
                     }
                 }
                 case 3 -> {
-                    if (isCommand(args[0])) {
+                    if (isOpCommand(player, args[0])
+                            || args[0].equalsIgnoreCase("보내기")) {
                         tabCompleteMessage.addAll(economyIDs);
                     }
                     return tabCompleteMessage;
                 }
                 case 4 -> {
-                    if (isCommand(args[0])) {
+                    if (isOpCommand(player, args[0])
+                            || args[0].equalsIgnoreCase("보내기")) {
                         tabCompleteMessage.add("금액");
                     }
                     return tabCompleteMessage;
@@ -69,10 +72,10 @@ public class CommandTabCompleter implements TabCompleter {
         return null;
     }
 
-    private boolean isCommand(String command) {
-        return command.equalsIgnoreCase("보내기")
-                || command.equalsIgnoreCase("지급")
+    private boolean isOpCommand(Player player, String command) {
+        return player.hasPermission("ucon.manage")
+                && (command.equalsIgnoreCase("지급")
                 || command.equalsIgnoreCase("차감")
-                || command.equalsIgnoreCase("설정");
+                || command.equalsIgnoreCase("설정"));
     }
 }
