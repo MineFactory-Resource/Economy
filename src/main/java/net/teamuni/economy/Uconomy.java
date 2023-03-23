@@ -51,9 +51,7 @@ public final class Uconomy extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(this.playerDataManager, this);
         Bukkit.getPluginManager().registerEvents(new JoinEvent(this), this);
         getCommand("돈").setExecutor(new UconomyCmd(this));
-        getCommand("uconomy").setExecutor(new UconomyCmd(this));
         getCommand("돈").setTabCompleter(new CommandTabCompleter(this));
-        getCommand("uconomy").setTabCompleter(new CommandTabCompleter(this));
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new UconomyPlaceholders().register();
         }

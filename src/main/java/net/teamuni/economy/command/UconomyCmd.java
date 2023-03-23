@@ -166,6 +166,15 @@ public class UconomyCmd implements CommandExecutor {
                                 return false;
                             }
                             break;
+                        case "리로드":
+                            if (player.hasPermission("ucon.reload")) {
+                                main.reloadConfig();
+                                main.getMessageManager().reload();
+                                this.messageListMap.putAll(main.getMessageManager().getMessages());
+                                main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("reload_message"));
+                                return false;
+                            }
+                            break;
                         default:
                             main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("not_available_command"));
                             break;
@@ -178,14 +187,6 @@ public class UconomyCmd implements CommandExecutor {
                     }
                 }
                 return false;
-            } else if (command.getName().equalsIgnoreCase("uconomy")) {
-                if (args.length > 0 && args[0].equalsIgnoreCase("reload")
-                        && player.hasPermission("ucon.reload")) {
-                    main.reloadConfig();
-                    main.getMessageManager().reload();
-                    this.messageListMap.putAll(main.getMessageManager().getMessages());
-                    main.getMessageManager().sendTranslatedMessage(player, this.messageListMap.get("reload_message"));
-                }
             }
             return false;
         }
