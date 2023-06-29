@@ -1,7 +1,6 @@
 name: Uconomy
 version: '${project.version}'
 main: net.teamuni.economy.Uconomy
-api-version: 1.19
 softdepend:
   - PlaceholderAPI
   - Vault
