@@ -6,11 +6,11 @@
 
 ### Use Paper Version:
 
-1.19.2
+1.20.1
 
-### Tested Paper Version:
+### Tested Purpur Version:
 
-1.19.2
+1.20.1
 
 ### Required Plugin:
 
