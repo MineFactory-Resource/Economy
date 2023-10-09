@@ -46,7 +46,11 @@ public class UconomyCmd implements CommandExecutor {
         if (args.length > 0 && args.length <= 4) {
             switch (args[0]) {
                 case "도움말" -> {
-                    if (player.hasPermission("ucon.manage")) {
+                    if (isInvalidLength(player, args, 1)) {
+                        return false;
+                    }
+
+                    if (player.isOp()) {
                         sendTranslatedMessage(player, "money_command_guide_for_op");
                     } else {
                         sendTranslatedMessage(player, "money_command_guide");
@@ -54,26 +58,31 @@ public class UconomyCmd implements CommandExecutor {
                 }
 
                 case "확인" -> {
-                    if (args.length == 2) {
-                        if (hasNoPermission(player)) {
-                            return false;
-                        }
-
-                        OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-
-                        if (isInvalidPlayer(player, target)) {
-                            return false;
-                        }
-
-                        assert target != null;
-
-                        this.messageManager.sendPlayerMoneyInfo(player, target);
-                    } else {
-                        sendTranslatedMessage(player, "not_available_command");
+                    if (isInvalidLength(player, args, 2)) {
+                        return false;
                     }
+
+                    if (hasNoPermission(player, "ucon.manage")) {
+                        return false;
+                    }
+
+                    OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
+
+                    if (isInvalidPlayer(player, target)) {
+                        return false;
+                    }
+
+                    assert target != null;
+
+                    this.messageManager.sendPlayerMoneyInfo(player, target);
+
                 }
 
                 case "보내기" -> {
+                    if (isInvalidLength(player, args, 4)) {
+                        return false;
+                    }
+
                     OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
 
                     if (isInvalidCommand(player, target, args)) {
@@ -120,7 +129,11 @@ public class UconomyCmd implements CommandExecutor {
                 }
 
                 case "지급", "차감", "설정" -> {
-                    if (hasNoPermission(player)) {
+                    if (isInvalidLength(player, args, 4)) {
+                        return false;
+                    }
+
+                    if (hasNoPermission(player, "ucon.manage")) {
                         return false;
                     }
 
@@ -132,9 +145,9 @@ public class UconomyCmd implements CommandExecutor {
 
                     String economyID = args[2];
                     long amount = Long.parseLong(args[3]);
-                    
+
                     assert target != null;
-                    
+
                     switch (args[0]) {
                         case "지급" -> {
                             this.moneyManager.deposit(target, economyID, amount);
@@ -166,13 +179,15 @@ public class UconomyCmd implements CommandExecutor {
                 }
 
                 case "리로드" -> {
-                    if (player.hasPermission("ucon.reload")) {
-                        main.reloadConfig();
-                        this.messageManager.reload();
-                        this.messageListMap.putAll(this.messageManager.getMessages());
-                        sendTranslatedMessage(player, "reload_message");
+                    if (isInvalidLength(player, args, 1)
+                        || hasNoPermission(player, "ucon.reload")) {
                         return false;
                     }
+
+                    main.reloadConfig();
+                    this.messageManager.reload();
+                    this.messageListMap.putAll(this.messageManager.getMessages());
+                    sendTranslatedMessage(player, "reload_message");
                 }
 
                 default -> sendTranslatedMessage(player, "not_available_command");
@@ -191,8 +206,7 @@ public class UconomyCmd implements CommandExecutor {
     }
 
     private boolean isInvalidCommand(Player player, OfflinePlayer target, String[] args) {
-        return isInvalidLength(player, args)
-            || isInvalidPlayer(player, target)
+        return isInvalidPlayer(player, target)
             || isInvalidEconomyID(player, args)
             || isNotNumber(player, args);
     }
@@ -201,8 +215,8 @@ public class UconomyCmd implements CommandExecutor {
         return main.getMoneyUpdater().hasAccount(uuid);
     }
 
-    private boolean hasNoPermission(Player player) {
-        if (!player.hasPermission("ucon.manage")) {
+    private boolean hasNoPermission(Player player, String permission) {
+        if (!player.hasPermission(permission)) {
             sendTranslatedMessage(player, "not_available_command");
             return true;
         }
@@ -217,8 +231,8 @@ public class UconomyCmd implements CommandExecutor {
         return false;
     }
 
-    private boolean isInvalidLength(Player player, String[] args) {
-        if (args.length != 4) {
+    private boolean isInvalidLength(Player player, String[] args, int length) {
+        if (args.length != length) {
             sendTranslatedMessage(player, "not_available_command");
             return true;
         }
