@@ -13,69 +13,76 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandTabCompleter implements TabCompleter {
+
     private final List<String> economyIDs = new ArrayList<>();
+
     public CommandTabCompleter(Uconomy instance) {
         this.economyIDs.addAll(instance.getConfig().getStringList("EconomyID"));
     }
+
     @Nullable
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
+        @NotNull String alias, @NotNull String[] args) {
         Player player = (Player) sender;
 
-        if (command.getName().equalsIgnoreCase("돈")) {
-            List<String> tabCompleteMessage = new ArrayList<>();
-
-            switch (args.length) {
-                case 1 -> {
-                    if (player.hasPermission("ucon.manage")) {
-                        tabCompleteMessage.add("확인");
-                        tabCompleteMessage.add("보내기");
-                        tabCompleteMessage.add("지급");
-                        tabCompleteMessage.add("차감");
-                        tabCompleteMessage.add("설정");
-                        tabCompleteMessage.add("리로드");
-                    } else {
-                        tabCompleteMessage.add("확인");
-                        tabCompleteMessage.add("보내기");
-                    }
-                    return tabCompleteMessage;
-                }
-                case 2 -> {
-                    if (isOpCommand(player, args[0])
-                            || args[0].equalsIgnoreCase("보내기")
-                            || args[0].equalsIgnoreCase("확인")
-                            && player.hasPermission("ucon.manage")) {
-                        Bukkit.getOnlinePlayers().forEach(p -> tabCompleteMessage.add(p.getName()));
-                        return tabCompleteMessage;
-                    }
-                }
-                case 3 -> {
-                    if (isOpCommand(player, args[0])
-                            || args[0].equalsIgnoreCase("보내기")) {
-                        tabCompleteMessage.addAll(economyIDs);
-                    }
-                    return tabCompleteMessage;
-                }
-                case 4 -> {
-                    if (isOpCommand(player, args[0])
-                            || args[0].equalsIgnoreCase("보내기")) {
-                        tabCompleteMessage.add("금액");
-                    }
-                    return tabCompleteMessage;
-                }
-                default -> {
-                    return null;
-                }
-            }
+        if (!command.getName().equalsIgnoreCase("돈")) {
             return null;
         }
-        return null;
+
+        List<String> tabCompleteMessage = new ArrayList<>();
+
+        switch (args.length) {
+            case 1 -> addFirstArgCommands(player, tabCompleteMessage);
+            case 2 -> addSecondArgCommands(player, args[0], tabCompleteMessage);
+            case 3 -> addThirdArgCommands(player, args[0], tabCompleteMessage);
+            case 4 -> addFourthArgCommands(player, args[0], tabCompleteMessage);
+        }
+
+        return tabCompleteMessage.isEmpty() ? null : tabCompleteMessage;
     }
 
-    private boolean isOpCommand(Player player, String command) {
+    private void addFirstArgCommands(Player player, List<String> commands) {
+        if (player.hasPermission("ucon.manage")) {
+            commands.add("확인");
+            commands.add("보내기");
+            commands.add("지급");
+            commands.add("차감");
+            commands.add("설정");
+            commands.add("리로드");
+            commands.add("도움말");
+        } else {
+            commands.add("확인");
+            commands.add("보내기");
+        }
+    }
+
+    private void addSecondArgCommands(Player player, String arg, List<String> commands) {
+        if (canUseOpCommand(player, arg)
+            || arg.equalsIgnoreCase("보내기")
+            || arg.equalsIgnoreCase("확인")) {
+            Bukkit.getOnlinePlayers().forEach(p -> commands.add(p.getName()));
+        }
+    }
+
+    private void addThirdArgCommands(Player player, String arg, List<String> commands) {
+        if (canUseOpCommand(player, arg)
+            || arg.equalsIgnoreCase("보내기")) {
+            commands.addAll(economyIDs);
+        }
+    }
+
+    private void addFourthArgCommands(Player player, String arg, List<String> commands) {
+        if (canUseOpCommand(player, arg)
+            || arg.equalsIgnoreCase("보내기")) {
+            commands.add("금액");
+        }
+    }
+
+    private boolean canUseOpCommand(Player player, String command) {
         return player.hasPermission("ucon.manage")
-                && (command.equalsIgnoreCase("지급")
-                || command.equalsIgnoreCase("차감")
-                || command.equalsIgnoreCase("설정"));
+            && (command.equalsIgnoreCase("지급")
+            || command.equalsIgnoreCase("차감")
+            || command.equalsIgnoreCase("설정"));
     }
 }
