@@ -2,6 +2,7 @@ package net.teamuni.economy.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.sql.DatabaseMetaData;
 import net.teamuni.economy.Uconomy;
 import net.teamuni.economy.data.MoneyUpdater;
 import net.teamuni.economy.data.PlayerData;
@@ -62,14 +63,14 @@ public class MySQLDatabase implements MoneyUpdater {
 
     private void updateColumn() throws SQLException {
         try (Connection connection = this.sql.getConnection()) {
-            StringBuilder query = new StringBuilder();
+            DatabaseMetaData dbm = connection.getMetaData();
             for (String economyID : this.economyIDs) {
-                try (Statement statement = connection.createStatement()) {
-                    query.append("ALTER TABLE uconomy ADD COLUMN IF NOT EXISTS ")
-                            .append(economyID)
-                            .append(" BIGINT");
-                    statement.execute(query.toString());
-                    query.setLength(0);
+                ResultSet columns = dbm.getColumns(null, null, "uconomy", economyID);
+                if (!columns.next()) {
+                    String query = "ALTER TABLE uconomy ADD COLUMN " + economyID + " BIGINT";
+                    try (PreparedStatement ps = connection.prepareStatement(query)) {
+                        ps.execute();
+                    }
                 }
             }
         }
