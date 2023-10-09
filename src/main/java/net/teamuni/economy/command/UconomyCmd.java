@@ -27,9 +27,9 @@ public class UconomyCmd implements CommandExecutor {
 
     public UconomyCmd(Uconomy instance) {
         this.main = instance;
-        this.messageListMap.putAll(instance.getMessageManager().getMessages());
         this.moneyManager = instance.getMoneyManager();
         this.messageManager = instance.getMessageManager();
+        this.messageListMap.putAll(this.messageManager.getMessages());
     }
 
     @Override
@@ -43,9 +43,7 @@ public class UconomyCmd implements CommandExecutor {
             return false;
         }
 
-        if (args.length == 0) {
-            this.messageManager.sendPlayerMoneyInfo(player);
-        } else {
+        if (args.length > 0 && args.length <= 4) {
             switch (args[0]) {
                 case "도움말" -> {
                     if (player.hasPermission("ucon.manage")) {
@@ -63,7 +61,7 @@ public class UconomyCmd implements CommandExecutor {
 
                         OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
 
-                        if (isValidPlayer(player, target)) {
+                        if (isInvalidPlayer(player, target)) {
                             return false;
                         }
 
@@ -77,22 +75,23 @@ public class UconomyCmd implements CommandExecutor {
 
                 case "보내기" -> {
                     OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-                    String economyID = args[2];
-                    long amount = Long.parseLong(args[3]);
 
                     if (isInvalidCommand(player, target, args)) {
                         return false;
                     }
 
+                    String economyID = args[2];
+                    long amount = Long.parseLong(args[3]);
+
                     if (isOneSelf(player, target)) {
                         return false;
                     }
 
-                    if (!hasEnoughMoney(player, economyID, amount)) {
+                    if (hasNotEnoughMoney(player, economyID, amount)) {
                         return false;
                     }
 
-                    if (!isValidAmount(player, amount)) {
+                    if (isInvalidAmount(player, amount)) {
                         return false;
                     }
 
@@ -103,7 +102,7 @@ public class UconomyCmd implements CommandExecutor {
                     this.messageManager.sendTranslatedMessage(player,
                         this.messageListMap.get("transaction_confirm_to_sender")
                         , "%economy_id%", economyID
-                        , "%name_of_target%", target.getName()
+                        , "%name_of_recipient%", target.getName()
                         , "%sent_money%", df.format(amount)
                         , "%sender_money_after_transaction%",
                         df.format(this.moneyManager.getBalance(player, economyID)));
@@ -111,11 +110,11 @@ public class UconomyCmd implements CommandExecutor {
                     if (target.isOnline()) {
                         Player onlineTarget = target.getPlayer();
                         this.messageManager.sendTranslatedMessage(onlineTarget,
-                            this.messageListMap.get("transaction_confirm_to_target")
+                            this.messageListMap.get("transaction_confirm_to_recipient")
                             , "%economy_id%", economyID
                             , "%name_of_sender%", player.getName()
                             , "%received_money%", df.format(amount)
-                            , "%target_money_after_transaction%", df.format(
+                            , "%recipient_money_after_transaction%", df.format(
                                 this.moneyManager.getBalance(target, economyID)));
                     }
                 }
@@ -126,12 +125,13 @@ public class UconomyCmd implements CommandExecutor {
                     }
 
                     OfflinePlayer target = Bukkit.getOfflinePlayerIfCached(args[1]);
-                    String economyID = args[2];
-                    long amount = Long.parseLong(args[3]);
 
                     if (isInvalidCommand(player, target, args)) {
                         return false;
                     }
+
+                    String economyID = args[2];
+                    long amount = Long.parseLong(args[3]);
                     
                     assert target != null;
                     
@@ -177,6 +177,10 @@ public class UconomyCmd implements CommandExecutor {
 
                 default -> sendTranslatedMessage(player, "not_available_command");
             }
+        } else if (args.length == 0) {
+            this.messageManager.sendPlayerMoneyInfo(player);
+        } else {
+            sendTranslatedMessage(player, "not_available_command");
         }
         return false;
     }
@@ -187,16 +191,10 @@ public class UconomyCmd implements CommandExecutor {
     }
 
     private boolean isInvalidCommand(Player player, OfflinePlayer target, String[] args) {
-        if (!isValidLength(player, args)) {
-            return true;
-        }
-        if (!isValidPlayer(player, target)) {
-            return true;
-        }
-        if (!isValidEconomyID(player, args)) {
-            return true;
-        }
-        return !isNumber(player, args);
+        return isInvalidLength(player, args)
+            || isInvalidPlayer(player, target)
+            || isInvalidEconomyID(player, args)
+            || isNotNumber(player, args);
     }
 
     private boolean hasAccount(UUID uuid) {
@@ -211,62 +209,62 @@ public class UconomyCmd implements CommandExecutor {
         return false;
     }
 
-    private boolean isValidPlayer(Player player, OfflinePlayer target) {
+    private boolean isInvalidPlayer(Player player, OfflinePlayer target) {
         if (target == null || !hasAccount(target.getUniqueId())) {
             sendTranslatedMessage(player, "incorrect_player_name");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
-    private boolean isValidLength(Player player, String[] args) {
+    private boolean isInvalidLength(Player player, String[] args) {
         if (args.length != 4) {
             sendTranslatedMessage(player, "not_available_command");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
-    private boolean isValidEconomyID(Player player, String[] args) {
+    private boolean isInvalidEconomyID(Player player, String[] args) {
         if (!main.getConfig().getStringList("EconomyID").contains(args[2])) {
             sendTranslatedMessage(player, "invalid_economyID");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
-    private boolean isNumber(Player player, String[] args) {
+    private boolean isNotNumber(Player player, String[] args) {
         if (!args[3].matches("[0-9]+")) {
             sendTranslatedMessage(player, "invalid_syntax");
-            return false;
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    private boolean hasNotEnoughMoney(Player player, String economyID, long amount) {
+        if (!this.moneyManager.has(player, economyID, amount)) {
+            this.messageManager.sendTranslatedMessage(player,
+                this.messageListMap.get("money_shortage"));
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isInvalidAmount(Player player, long amount) {
+        if (amount < main.getConfig().getLong("minimum_amount")) {
+            this.messageManager.sendTranslatedMessage(player,
+                this.messageListMap.get("minimum_amount_caution")
+                , "%value_of_minimum%", df.format(main.getConfig().getLong("minimum_amount")));
+            return true;
+        }
+        return false;
     }
 
     private boolean isOneSelf(Player player, OfflinePlayer target) {
         if (target == player) {
             sendTranslatedMessage(player, "attempt_to_deposit_to_oneself");
-            return false;
+            return true;
         }
-        return true;
-    }
-
-    private boolean hasEnoughMoney(Player player, String economyID, long amount) {
-        if (!this.moneyManager.has(player, economyID, amount)) {
-            this.messageManager.sendTranslatedMessage(player,
-                this.messageListMap.get("money_shortage"));
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isValidAmount(Player player, long amount) {
-        if (amount < main.getConfig().getLong("minimum_amount")) {
-            this.messageManager.sendTranslatedMessage(player,
-                this.messageListMap.get("minimum_amount_caution")
-                , "%value_of_minimum%", df.format(main.getConfig().getLong("minimum_amount")));
-            return false;
-        }
-        return true;
+        return false;
     }
 }
