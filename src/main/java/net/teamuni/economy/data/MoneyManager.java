@@ -41,6 +41,11 @@ public class MoneyManager {
 
     public void withdraw(OfflinePlayer player, String economyID, long amount) {
         long withdrewMoney = getBalance(player, economyID) - amount;
+
+        if (withdrewMoney < 0) {
+            withdrewMoney = 0;
+        }
+
         main.getPlayerDataManager().getCache(player.getUniqueId()).set(economyID, withdrewMoney);
     }
 
